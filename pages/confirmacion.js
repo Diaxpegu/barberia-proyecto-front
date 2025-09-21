@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import React, { useEffect } from 'react';
 
 export default function Confirmacion() {
   const router = useRouter();
@@ -78,7 +79,7 @@ export default function Confirmacion() {
           </a>
         </Link>
       </div>
-      
+
       <div className="confirmacion-info">
         <p><i className="fas fa-info-circle"></i> Recibirás un correo de confirmación con los detalles de tu reserva.</p>
         <p><i className="fas fa-clock"></i> Por favor llega 5 minutos antes de tu hora agendada.</p>

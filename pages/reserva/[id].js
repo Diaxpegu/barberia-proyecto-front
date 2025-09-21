@@ -1,84 +1,6 @@
-import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
-export default function Reserva() {
-  const router = useRouter();
-  const { id } = router.query; // Obtiene el ID del peluquero de la URL
-
-  // Datos simulados, estos vendrían de la base de datos
-  const peluquerosData = [
-    {
-      id: '1',
-      nombre: 'Lucas Aldair',
-      instagram: 'lukas__aldair',
-      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
-      precios: {
-        'Corte básico': 15000,
-        'Corte premium': 20000,
-        Tintura: 25000,
-        Lavado: 5000,
-        Peinado: 10000,
-      },
-      // Horarios simulados
-      horarios: {
-        '2023-11-20': { // Ejemplo para una fecha
-          '08:00': 'disponible',
-          '09:00': 'disponible',
-          '10:00': 'ocupado',
-          '11:00': 'disponible',
-          '12:00': 'disponible',
-          '13:00': 'disponible',
-          '14:00': 'ocupado',
-          '15:00': 'disponible',
-          '16:00': 'disponible',
-          '17:00': 'disponible',
-        },
-        '2023-11-21': { 
-          '08:00': 'disponible',
-          '09:00': 'disponible',
-          '10:00': 'disponible',
-          '11:00': 'disponible',
-          '12:00': 'disponible',
-          '13:00': 'disponible',
-          '14:00': 'disponible',
-          '15:00': 'disponible',
-          '16:00': 'disponible',
-          '17:00': 'disponible',
-        },
-      },
-    },
-    {
-      id: '2',
-      nombre: 'Alejandro',
-      instagram: 'ale_.cut',
-      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
-      precios: {
-        'Corte básico': 15000,
-        'Corte premium': 20000,
-        Tintura: 25000,
-        Lavado: 5000,
-        Peinado: 10000,
-      },
-      horarios: {
-        '2023-11-20': {
-          '08:00': 'disponible',
-          '09:00': 'ocupado',
-          '10:00': 'disponible',
-          '11:00': 'disponible',
-          '12:00': 'disponible',
-          '13:00': 'ocupado',
-          '14:00': 'disponible',
-          '15:00': 'disponible',
-          '16:00': 'disponible',
-          '17:00': 'disponible',
-        },
-      },
-    },
-  ];
-
-  // Busca el peluquero actual por el ID de la URL
-  const peluquero = peluquerosData.find((p) => p.id === id);
-
+export default function Reserva({ peluquero }) {
   // --- Estados del formulario y la UI ---
   const [formData, setFormData] = useState({
     fecha: '',
@@ -90,17 +12,16 @@ export default function Reserva() {
     telefono: '',
     rut: '',
   });
-  const [currentStep, setCurrentStep] = useState(1); // Controla el paso actual del formulario
-  const [error, setError] = useState(''); // Para mostrar mensajes de error
-  const [selectedDate, setSelectedDate] = useState(''); // Fecha seleccionada en el calendario
-  const [availableHours, setAvailableHours] = useState({}); // Horarios disponibles para la fecha seleccionada
+  const [currentStep, setCurrentStep] = useState(1);
+  const [error, setError] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [availableHours, setAvailableHours] = useState({});
 
-  // --- Efecto para cargar horarios cuando cambia la fecha seleccionada ---
   useEffect(() => {
     if (selectedDate && peluquero && peluquero.horarios[selectedDate]) {
       setAvailableHours(peluquero.horarios[selectedDate]);
     } else {
-      setAvailableHours({}); // No hay horarios para la fecha o peluquero
+      setAvailableHours({});
     }
     // Limpiar la hora seleccionada si la fecha cambia
     setFormData((prev) => ({ ...prev, hora: '' }));
@@ -112,7 +33,7 @@ export default function Reserva() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError(''); // Limpia errores al cambiar un campo
+    setError('');
   };
 
   // Maneja la selección de fecha desde el datepicker
@@ -200,7 +121,6 @@ export default function Reserva() {
           clienteRut: formData.rut,
         },
       });
-
     } catch (err) {
       console.error('Error al procesar la reserva:', err);
       setError(err.message || 'Hubo un problema al agendar tu reserva. Inténtalo de nuevo.');
@@ -268,9 +188,8 @@ export default function Reserva() {
               required
               value={formData.fecha}
               onChange={handleDateChange}
-              min={new Date().toISOString().split('T')[0]} // No permite fechas pasadas
+              min={new Date().toISOString().split('T')[0]}
             />
-            <div id="calendar-container"></div>
           </div>
 
           <div className="form-group">
@@ -281,7 +200,7 @@ export default function Reserva() {
                 <h4>Mañana</h4>
                 <div className="horarios-grid">
                   {['08:00', '09:00', '10:00', '11:00'].map((hora) => {
-                    const estado = availableHours[hora] || 'no-disponible'; // 'disponible', 'ocupado', 'no-disponible'
+                    const estado = availableHours[hora] || 'no-disponible';
                     return (
                       <div key={hora} className={`hora-slot ${estado}`}>
                         <input
@@ -295,7 +214,7 @@ export default function Reserva() {
                           required
                         />
                         <label htmlFor={`hora-${hora}`}>
-                          {hora} - <span className="estado">{estado.replace('-', ' ').capitalize()}</span>
+                          {hora} - <span className="estado">{estado.replace('-', ' ').charAt(0).toUpperCase() + estado.slice(1)}</span>
                         </label>
                       </div>
                     );
@@ -322,7 +241,7 @@ export default function Reserva() {
                           required
                         />
                         <label htmlFor={`hora-${hora}`}>
-                          {hora} - <span className="estado">{estado.replace('-', ' ').capitalize()}</span>
+                          {hora} - <span className="estado">{estado.replace('-', ' ').charAt(0).toUpperCase() + estado.slice(1)}</span>
                         </label>
                       </div>
                     );
@@ -420,9 +339,103 @@ export default function Reserva() {
     </section>
   );
 }
-// Esto es para el estado de los horarios (disponible, ocupado)
-if (!String.prototype.capitalize) {
-  String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1);
+
+// getStaticPaths para definir rutas dinámicas
+export async function getStaticPaths() {
+  const peluqueroIds = ['1', '2'];
+
+  const paths = peluqueroIds.map((id) => ({
+    params: { id },
+  }));
+
+  return {
+    paths,
+    fallback: false,
+  };
+}
+
+// getStaticProps para pasar datos al componente
+export async function getStaticProps({ params }) {
+  const peluquerosData = [
+    {
+      id: '1',
+      nombre: 'Lucas Aldair',
+      instagram: 'lukas__aldair',
+      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
+      precios: {
+        'Corte básico': 15000,
+        'Corte premium': 20000,
+        Tintura: 25000,
+        Lavado: 5000,
+        Peinado: 10000,
+      },
+      horarios: {
+        '2023-11-20': {
+          '08:00': 'disponible',
+          '09:00': 'disponible',
+          '10:00': 'ocupado',
+          '11:00': 'disponible',
+          '12:00': 'disponible',
+          '13:00': 'disponible',
+          '14:00': 'ocupado',
+          '15:00': 'disponible',
+          '16:00': 'disponible',
+          '17:00': 'disponible',
+        },
+        '2023-11-21': {
+          '08:00': 'disponible',
+          '09:00': 'disponible',
+          '10:00': 'disponible',
+          '11:00': 'disponible',
+          '12:00': 'disponible',
+          '13:00': 'disponible',
+          '14:00': 'disponible',
+          '15:00': 'disponible',
+          '16:00': 'disponible',
+          '17:00': 'disponible',
+        },
+      },
+    },
+    {
+      id: '2',
+      nombre: 'Alejandro',
+      instagram: 'ale_.cut',
+      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
+      precios: {
+        'Corte básico': 15000,
+        'Corte premium': 20000,
+        Tintura: 25000,
+        Lavado: 5000,
+        Peinado: 10000,
+      },
+      horarios: {
+        '2023-11-20': {
+          '08:00': 'disponible',
+          '09:00': 'ocupado',
+          '10:00': 'disponible',
+          '11:00': 'disponible',
+          '12:00': 'disponible',
+          '13:00': 'ocupado',
+          '14:00': 'disponible',
+          '15:00': 'disponible',
+          '16:00': 'disponible',
+          '17:00': 'disponible',
+        },
+      },
+    },
+  ];
+
+  const peluquero = peluquerosData.find((p) => p.id === params.id);
+
+  if (!peluquero) {
+    return {
+      notFound: true,
+    };
   }
+
+  return {
+    props: {
+      peluquero,
+    },
+  };
 }
