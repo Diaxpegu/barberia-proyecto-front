@@ -430,7 +430,7 @@ footer {
     cursor: not-allowed;
 }
 
-.hora-slot.por-confirmar { /* Changed from 'por confirmar' to 'por-confirmar' for CSS class naming convention */
+.hora-slot.por-confirmar {
     background-color: #fff3cd;
     border: 1px solid #ffeeba;
     color: #856404;
@@ -452,7 +452,7 @@ footer {
     box-shadow: var(--shadow);
 }
 
-/* ESTILOS ORIGINALES BOTÓN CONFIRMAR */
+/* ESTILOS BOTÓN CONFIRMAR */
 .btn-confirmar {
     background-color: var(--color-secondary);
     color: var(--color-primary);
@@ -718,7 +718,7 @@ footer {
     object-fit: cover;
 }
 
-/* Contact Section */
+/* Contactanos*/
 .contact-section {
     padding: 3rem 2rem;
     background: #f5f5f5;
@@ -1107,5 +1107,346 @@ footer {
     
     .time-sections {
         grid-template-columns: 1fr;
+    }
+}
+/* styles/reserva.module.css o añadir a globals.css */
+
+.reserva-container {
+    display: grid;
+    grid-template-columns: 1fr 300px; /* Contenido principal y sidebar de resumen */
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--color-background-light); /* Asume que tienes variables CSS */
+    border-radius: 8px;
+    box-shadow: var(--shadow); /* Asume que tienes variables CSS */
+}
+
+.reserva-container h2 {
+    grid-column: 1 / -1; /* Ocupa todo el ancho */
+    text-align: center;
+    color: var(--color-primary);
+    margin-bottom: 1.5rem;
+}
+
+.reserva-container .instagram {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--color-text-secondary);
+}
+
+.reserva-container .instagram a {
+    color: var(--color-secondary);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.error-message {
+    grid-column: 1 / -1;
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Indicador de pasos */
+.reserva-steps {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.reserva-steps .step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    background-color: var(--color-light-gray);
+    color: var(--color-text-secondary);
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.reserva-steps .step.active {
+    background-color: var(--color-primary);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.reserva-steps .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: white;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+}
+
+.reserva-steps .step.active .step-number {
+    background-color: var(--color-secondary);
+    color: white;
+}
+
+/* Formulario */
+.reserva-form {
+    grid-column: 1 / 2; /* Ocupa la primera columna */
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.form-step {
+    display: none; /* Oculta los pasos por defecto */
+}
+
+.form-step.active {
+    display: block; /* Muestra el paso activo */
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: var(--color-text-primary);
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="date"],
+.form-group select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Asegura que padding no aumente el ancho */
+}
+
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.5); /* Ajusta el color del icono del calendario */
+}
+
+/* Horarios */
+.time-sections {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.time-section {
+    flex: 1;
+    background-color: var(--color-light-gray);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.time-section h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+    text-align: center;
+}
+
+.horarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+}
+
+.hora-slot {
+    background-color: white;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hora-slot input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.hora-slot label {
+    display: block;
+    padding: 0.8rem 0.5rem;
+    font-weight: normal;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    position: relative;
+    z-index: 0;
+}
+
+.hora-slot.disponible label {
+    background-color: #e6ffe6; /* Verde claro */
+}
+
+.hora-slot.disponible input[type="radio"]:checked + label {
+    background-color: var(--color-secondary); /* Verde más oscuro al seleccionar */
+    color: white;
+}
+
+.hora-slot.ocupado {
+    background-color: #ffe6e6; /* Rojo claro */
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+}
+
+.hora-slot.ocupado label {
+    text-decoration: line-through;
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+}
+
+.hora-slot.no-disponible {
+    background-color: var(--color-light-gray);
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+}
+
+.hora-slot.no-disponible label {
+    text-decoration: line-through;
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+}
+
+.hora-slot .estado {
+    font-size: 0.8em;
+    display: block;
+    margin-top: 0.2em;
+}
+
+/* Navegación del formulario */
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+.btn-next, .btn-prev, .btn-confirmar {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-next, .btn-confirmar {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.btn-next:hover, .btn-confirmar:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-2px);
+}
+
+.btn-prev {
+    background-color: var(--color-light-gray);
+    color: var(--color-text-primary);
+}
+
+.btn-prev:hover {
+    background-color: var(--color-border);
+    transform: translateY(-2px);
+}
+
+/* Resumen de la reserva (sidebar) */
+.reserva-summary {
+    grid-column: 2 / 3; /* Ocupa la segunda columna */
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    height: fit-content; /* Ajusta la altura al contenido */
+    position: sticky; /* Para que se quede fijo al hacer scroll */
+    top: 2rem; /* Distancia desde la parte superior */
+}
+
+.reserva-summary h4 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary);
+    text-align: center;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1rem;
+}
+
+.summary-content .summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.summary-content .summary-item strong {
+    color: var(--color-text-primary);
+}
+
+.summary-content .summary-item span {
+    color: var(--color-text-secondary);
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 992px) {
+    .reserva-container {
+        grid-template-columns: 1fr; /* Una sola columna en pantallas pequeñas */
+        padding: 1rem;
+    }
+
+    .reserva-summary {
+        grid-column: 1 / -1; /* Ocupa todo el ancho */
+        position: static; /* No sticky en móvil */
+        margin-top: 2rem;
+    }
+
+    .time-sections {
+        flex-direction: column; /* Horarios en columna */
+    }
+}
+
+@media (max-width: 576px) {
+    .reserva-steps {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .reserva-steps .step {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .form-navigation {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .btn-next, .btn-prev, .btn-confirmar {
+        width: 100%;
     }
 }

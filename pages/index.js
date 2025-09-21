@@ -39,7 +39,7 @@ export default function Home() {
 
   const contact_info = {
     direccion: 'Victoria 2486, Valparaíso, Chile',
-    telefono: '+56 9 1234 5678',
+    telefono: '+56 9 xxxx xxxx',
     email: 'info@valiantbarber.com',
     redes_sociales: {
       instagram: 'https://instagram.com/valiant_barber',
@@ -105,6 +105,7 @@ export default function Home() {
                   ))}
                 </ul>
               </div>
+              {/* Botón Reservar abre en misma pestaña */}
               <a href={`/reserva/${peluquero.id}`} className="btn-reservar">
                 <i className="fas fa-calendar-check"></i> Reservar
               </a>
