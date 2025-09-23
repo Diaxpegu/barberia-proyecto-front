@@ -2,12 +2,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export default function AdminPanel() {
-  const [data, setData] = useState([]); // Para guardar resultados de las consultas
-  const [columns, setColumns] = useState([]); // Para guardar nombres de columnas dinámicas
+  const [data, setData] = useState([]);
+  const [columns, setColumns] = useState([]);
+  const [inputId, setInputId] = useState(''); // Para ID de acciones
 
   const backendUrl = 'https://back-production-57ce.up.railway.app';
 
-  // Función genérica para mostrar datos en tabla
+  // Función genérica para mostrar datos
   const fetchData = async (endpoint) => {
     try {
       const res = await fetch(`${backendUrl}${endpoint}`);
@@ -26,96 +27,82 @@ export default function AdminPanel() {
     }
   };
 
-  // Funciones de cada botón
-  const mostrarClientes = () => fetchData('/clientes/');
-  const mostrarBarberos = () => fetchData('/barberos/');
-  const mostrarServicios = () => fetchData('/servicios/');
-  const mostrarProductos = () => fetchData('/productos/');
-  const mostrarDisponibilidad = () => fetchData('/disponibilidad/libre/');
-  const mostrarReservasPendientes = () => fetchData('/reservas/pendientes/');
-  const mostrarReservasDetalle = () => fetchData('/reservas/detalle/');
-
-  // Funciones con ID fijo por ahora
-  const bloquearHorario = async () => {
-    const id = prompt("Ingrese el ID de disponibilidad a bloquear:");
-    if (!id) return;
+  // Función para acciones que requieren ID
+  const ejecutarAccionConId = async (accion, endpointBase) => {
+    if (!inputId) return alert('Ingrese un ID');
     try {
-      const res = await fetch(`${backendUrl}/disponibilidad/bloquear/${id}`, { method: 'PUT' });
-      const data = await res.json();
-      alert(data.mensaje);
+      const res = await fetch(`${backendUrl}${endpointBase}/${inputId}`, { method: accion });
+      const jsonData = await res.json();
+      alert(jsonData.mensaje);
+      setInputId('');
     } catch (err) {
       console.error(err);
-      alert('Error al bloquear horario');
-    }
-  };
-
-  const confirmarReserva = async () => {
-    const id = prompt("Ingrese el ID de reserva a confirmar:");
-    if (!id) return;
-    try {
-      const res = await fetch(`${backendUrl}/reservas/confirmar/${id}`, { method: 'PUT' });
-      const data = await res.json();
-      alert(data.mensaje);
-    } catch (err) {
-      console.error(err);
-      alert('Error al confirmar reserva');
-    }
-  };
-
-  const cancelarReserva = async () => {
-    const id = prompt("Ingrese el ID de reserva a cancelar:");
-    if (!id) return;
-    try {
-      const res = await fetch(`${backendUrl}/reservas/cancelar/${id}`, { method: 'DELETE' });
-      const data = await res.json();
-      alert(data.mensaje);
-    } catch (err) {
-      console.error(err);
-      alert('Error al cancelar reserva');
+      alert('Error en la acción');
     }
   };
 
   return (
     <section className="admin-panel-container">
       <h2>Panel de Administración</h2>
-      <p>Panel de consultas de ejemplo.</p>
+      <p>Consultas y acciones sobre la base de datos de la barbería:</p>
 
       <div className="admin-actions-grid">
-        <button className="admin-btn" onClick={mostrarClientes}>
+        <button className="admin-btn" onClick={() => fetchData('/clientes/')}>
           <i className="fas fa-users"></i> Mostrar Clientes Registrados
         </button>
-        <button className="admin-btn" onClick={mostrarBarberos}>
+
+        <button className="admin-btn" onClick={() => fetchData('/barberos/')}>
           <i className="fas fa-cut"></i> Mostrar Barberos Disponibles
         </button>
-        <button className="admin-btn" onClick={mostrarServicios}>
+
+        <button className="admin-btn" onClick={() => fetchData('/servicios/')}>
           <i className="fas fa-book-open"></i> Catálogo de Servicios y Precios
         </button>
-        <button className="admin-btn" onClick={mostrarProductos}>
+
+        <button className="admin-btn" onClick={() => fetchData('/productos/')}>
           <i className="fas fa-book-open"></i> Catálogo de Productos y Precios
         </button>
-        <button className="admin-btn" onClick={mostrarDisponibilidad}>
+
+        <button className="admin-btn" onClick={() => fetchData('/disponibilidad/libre/')}>
           <i className="fas fa-calendar-alt"></i> Bloques de Disponibilidad Libres
         </button>
-        <button className="admin-btn" onClick={mostrarReservasPendientes}>
+
+        <button className="admin-btn" onClick={() => fetchData('/reservas/pendientes/')}>
           <i className="fas fa-clock"></i> Reservas Pendientes
         </button>
-        <button className="admin-btn" onClick={bloquearHorario}>
+
+        <button className="admin-btn" onClick={() => ejecutarAccionConId('PUT', '/disponibilidad/bloquear')}>
           <i className="fas fa-ban"></i> Bloquear Horario de Barbero
         </button>
-        <button className="admin-btn" onClick={confirmarReserva}>
+
+        <button className="admin-btn" onClick={() => ejecutarAccionConId('PUT', '/reservas/confirmar')}>
           <i className="fas fa-check-circle"></i> Confirmar una Reserva
         </button>
-        <button className="admin-btn" onClick={cancelarReserva}>
+
+        <button className="admin-btn" onClick={() => ejecutarAccionConId('DELETE', '/reservas/cancelar')}>
           <i className="fas fa-times-circle"></i> Cancelar Reserva
         </button>
-        <button className="admin-btn" onClick={mostrarReservasDetalle}>
+
+        <button className="admin-btn" onClick={() => fetchData('/reservas/detalle/')}>
           <i className="fas fa-list-alt"></i> Todas las Reservas (Detalle Completo)
         </button>
       </div>
 
-      {/* Tabla dinámica para mostrar datos */}
+      {/* Input para las acciones que requieren ID */}
+      <div style={{ marginTop: '15px' }}>
+        <input
+          type="text"
+          placeholder="Ingrese ID"
+          value={inputId}
+          onChange={(e) => setInputId(e.target.value)}
+          style={{ marginRight: '10px' }}
+        />
+        <span>Usar ID correspondiente para bloquear, confirmar o cancelar</span>
+      </div>
+
+      {/* Tabla dinámica */}
       {data.length > 0 && (
-        <div className="admin-data-table">
+        <div className="admin-data-table" style={{ marginTop: '20px' }}>
           <h3>Resultados</h3>
           <table>
             <thead>
@@ -138,7 +125,7 @@ export default function AdminPanel() {
         </div>
       )}
 
-      <div className="admin-footer-actions">
+      <div className="admin-footer-actions" style={{ marginTop: '20px' }}>
         <Link href="/">
           <a className="btn-back-home">
             <i className="fas fa-home"></i> Volver al Inicio
