@@ -15,7 +15,7 @@ export default function Login() {
     if (Nombre === 'Admin' && Contraseña === 'SuperAdmin') {
       //aquí solo redirigimos
       localStorage.setItem('isAdminLoggedIn', 'true');
-      router.push('/admin-panel');
+      router.push('/Panel-Admin');
     } else {
       setError('Usuario o contraseña incorrectos.');
     }
