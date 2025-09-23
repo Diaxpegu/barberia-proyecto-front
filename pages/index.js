@@ -127,8 +127,8 @@ export default function Home() {
             <div className="about-image">
               <video
                 src="/Interior.mp4"
-                width={800}
-                height={500}
+                width={350}
+                height={200}
                 controls
                 style ={{width: '100%', height: 'auto', objectFit: 'cover' }}
                 poster="/valiant.jpg"
