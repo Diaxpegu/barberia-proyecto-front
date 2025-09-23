@@ -126,7 +126,7 @@ export default function Home() {
             </div>
             <div className="about-image">
               <Image
-                src="https://images.unsplash.com/photo-1585747861815-0468f061d312?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                src="/Interior.mp4"
                 alt="Interior de VALIANT Barbería"
                 width={800}
                 height={500}
