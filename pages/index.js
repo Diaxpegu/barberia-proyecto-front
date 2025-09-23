@@ -130,7 +130,6 @@ export default function Home() {
                 width={350}
                 height={200}
                 controls
-                style ={{width: '100%', height: 'auto', objectFit: 'cover' }}
                 poster="/valiant.jpg"
               />
             </div>

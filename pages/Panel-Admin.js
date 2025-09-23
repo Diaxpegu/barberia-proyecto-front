@@ -41,6 +41,9 @@ export default function AdminPanel() {
           <i className="fas fa-book-open"></i> Catálogo de Servicios y Precios
         </button>
         <button className="admin-btn">
+          <i className="fas fa-book-open"></i> Catálogo de Productos y Precios
+        </button>
+        <button className="admin-btn">
           <i className="fas fa-calendar-alt"></i> Bloques de Disponibilidad Libres
         </button>
         <button className="admin-btn">
