@@ -125,13 +125,13 @@ export default function Home() {
               <p>{about_info.historia}</p>
             </div>
             <div className="about-image">
-              <Image
+              <video
                 src="/Interior.mp4"
-                alt="Interior de VALIANT Barbería"
                 width={800}
                 height={500}
-                layout="responsive"
-                objectFit="cover"
+                controls
+                style ={{width: '100%', height: 'auto', objectFit: 'cover' }}
+                poster="/valiant.jpg"
               />
             </div>
           </div>
