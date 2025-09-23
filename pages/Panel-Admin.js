@@ -2,37 +2,34 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export default function AdminPanel() {
-  const [data, setData] = useState([]); // Para resultados de consultas
-  const [columns, setColumns] = useState([]); // Para nombres de columnas
+  const [panelActivo, setPanelActivo] = useState(null); // Panel que se muestra
+  const [data, setData] = useState([]);
+  const [columns, setColumns] = useState([]);
 
   const backendUrl = 'https://back-production-57ce.up.railway.app';
 
-  // Función genérica para obtener datos de un endpoint
-  const fetchData = async (endpoint) => {
+  const fetchData = async (endpoint, panel) => {
     try {
       const res = await fetch(`${backendUrl}${endpoint}`);
       const jsonData = await res.json();
-      if (jsonData.length > 0) {
-        setColumns(Object.keys(jsonData[0]));
-        setData(jsonData);
-      } else {
-        setColumns([]);
-        setData([]);
-        alert("No hay datos disponibles");
-      }
+      setColumns(jsonData.length > 0 ? Object.keys(jsonData[0]) : []);
+      setData(jsonData);
+      setPanelActivo(panel); // Abrir el panel correspondiente
     } catch (err) {
       console.error(err);
       alert('Error al obtener los datos');
     }
   };
 
-  // Consultas CRUD para cada botón
-  const mostrarClientes = () => fetchData('/clientes/');
-  const mostrarBarberos = () => fetchData('/barberos/');
-  const mostrarServicios = () => fetchData('/servicios/');
-  const mostrarProductos = () => fetchData('/productos/');
-  const mostrarDisponibilidad = () => fetchData('/disponibilidad/libre/');
-  const mostrarReservasPendientes = () => fetchData('/reservas/pendientes/');
+  // Funciones para cada botón
+  const mostrarClientes = () => fetchData('/clientes/', 'clientes');
+  const mostrarBarberos = () => fetchData('/barberos/', 'barberos');
+  const mostrarServicios = () => fetchData('/servicios/', 'servicios');
+  const mostrarProductos = () => fetchData('/productos/', 'productos');
+  const mostrarDisponibilidad = () => fetchData('/disponibilidad/libre/', 'disponibilidad');
+  const mostrarReservasPendientes = () => fetchData('/reservas/pendientes/', 'reservasPendientes');
+  const mostrarReservasDetalle = () => fetchData('/reservas/detalle/', 'reservasDetalle');
+
   const bloquearHorario = async () => {
     const id = prompt("Ingrese ID de disponibilidad a bloquear:");
     if (!id) return;
@@ -45,6 +42,7 @@ export default function AdminPanel() {
       alert('Error al bloquear horario');
     }
   };
+
   const confirmarReserva = async () => {
     const id = prompt("Ingrese ID de reserva a confirmar:");
     if (!id) return;
@@ -57,6 +55,7 @@ export default function AdminPanel() {
       alert('Error al confirmar reserva');
     }
   };
+
   const cancelarReserva = async () => {
     const id = prompt("Ingrese ID de reserva a cancelar:");
     if (!id) return;
@@ -69,77 +68,67 @@ export default function AdminPanel() {
       alert('Error al cancelar reserva');
     }
   };
-  const mostrarReservasDetalle = () => fetchData('/reservas/detalle/');
 
-  return (
-    <section className="admin-panel-container">
-      <h2>Panel de Administración</h2>
-      <p>Panel de consultas de ejemplo.</p>
-
-      <div className="admin-actions-grid">
-        <button className="admin-btn" onClick={mostrarClientes}>
-          <i className="fas fa-users"></i> Mostrar Clientes Registrados
-        </button>
-        <button className="admin-btn" onClick={mostrarBarberos}>
-          <i className="fas fa-cut"></i> Mostrar Barberos Disponibles
-        </button>
-        <button className="admin-btn" onClick={mostrarServicios}>
-          <i className="fas fa-book-open"></i> Catálogo de Servicios y Precios
-        </button>
-        <button className="admin-btn" onClick={mostrarProductos}>
-          <i className="fas fa-book-open"></i> Catálogo de Productos y Precios
-        </button>
-        <button className="admin-btn" onClick={mostrarDisponibilidad}>
-          <i className="fas fa-calendar-alt"></i> Bloques de Disponibilidad Libres
-        </button>
-        <button className="admin-btn" onClick={mostrarReservasPendientes}>
-          <i className="fas fa-clock"></i> Reservas Pendientes
-        </button>
-        <button className="admin-btn" onClick={bloquearHorario}>
-          <i className="fas fa-ban"></i> Bloquear Horario de Barbero
-        </button>
-        <button className="admin-btn" onClick={confirmarReserva}>
-          <i className="fas fa-check-circle"></i> Confirmar una Reserva
-        </button>
-        <button className="admin-btn" onClick={cancelarReserva}>
-          <i className="fas fa-times-circle"></i> Cancelar Reserva
-        </button>
-        <button className="admin-btn" onClick={mostrarReservasDetalle}>
-          <i className="fas fa-list-alt"></i> Todas las Reservas (Detalle Completo)
-        </button>
-      </div>
-
-      {/* Tabla dinámica */}
-      {data.length > 0 && (
-        <div className="admin-data-table">
-          <h3>Resultados</h3>
+  // Render de paneles dinámicos
+  const renderPanel = () => {
+    if (!panelActivo) return <p>Seleccione una consulta para ver los resultados.</p>;
+    return (
+      <div className="admin-subpanel">
+        <h3>
+          {panelActivo === 'clientes' && 'Clientes Registrados'}
+          {panelActivo === 'barberos' && 'Barberos Disponibles'}
+          {panelActivo === 'servicios' && 'Servicios y Precios'}
+          {panelActivo === 'productos' && 'Productos y Precios'}
+          {panelActivo === 'disponibilidad' && 'Bloques de Disponibilidad Libres'}
+          {panelActivo === 'reservasPendientes' && 'Reservas Pendientes'}
+          {panelActivo === 'reservasDetalle' && 'Todas las Reservas - Detalle Completo'}
+        </h3>
+        {data.length === 0 ? (
+          <p>No hay datos para mostrar</p>
+        ) : (
           <table>
             <thead>
               <tr>
-                {columns.map((col) => (
-                  <th key={col}>{col}</th>
-                ))}
+                {columns.map((col) => <th key={col}>{col}</th>)}
               </tr>
             </thead>
             <tbody>
               {data.map((row, idx) => (
                 <tr key={idx}>
-                  {columns.map((col) => (
-                    <td key={col}>{row[col]}</td>
-                  ))}
+                  {columns.map((col) => <td key={col}>{row[col]}</td>)}
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      )}
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <section className="admin-panel-container">
+      <h2>Panel de Administración</h2>
+
+      <div className="admin-actions-grid">
+        <button className="admin-btn" onClick={mostrarClientes}>Mostrar Clientes</button>
+        <button className="admin-btn" onClick={mostrarBarberos}>Mostrar Barberos</button>
+        <button className="admin-btn" onClick={mostrarServicios}>Servicios y Precios</button>
+        <button className="admin-btn" onClick={mostrarProductos}>Productos y Precios</button>
+        <button className="admin-btn" onClick={mostrarDisponibilidad}>Disponibilidad Libre</button>
+        <button className="admin-btn" onClick={mostrarReservasPendientes}>Reservas Pendientes</button>
+        <button className="admin-btn" onClick={bloquearHorario}>Bloquear Horario</button>
+        <button className="admin-btn" onClick={confirmarReserva}>Confirmar Reserva</button>
+        <button className="admin-btn" onClick={cancelarReserva}>Cancelar Reserva</button>
+        <button className="admin-btn" onClick={mostrarReservasDetalle}>Detalle Completo Reservas</button>
+      </div>
+
+      {/* Panel dinámico */}
+      <div className="admin-panel-display">
+        {renderPanel()}
+      </div>
 
       <div className="admin-footer-actions">
-        <Link href="/">
-          <a className="btn-back-home">
-            <i className="fas fa-home"></i> Volver al Inicio
-          </a>
-        </Link>
+        <Link href="/"><a className="btn-back-home">Volver al Inicio</a></Link>
       </div>
     </section>
   );
