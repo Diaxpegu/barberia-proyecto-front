@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router'; // AÑADE ESTA IMPORTACIÓN
 
 export default function Reserva({ peluquero }) {
+  const router = useRouter(); // AÑADE ESTO
+  
   // --- Estados del formulario y la UI ---
   const [formData, setFormData] = useState({
     fecha: '',
@@ -23,20 +26,16 @@ export default function Reserva({ peluquero }) {
     } else {
       setAvailableHours({});
     }
-    // Limpiar la hora seleccionada si la fecha cambia
     setFormData((prev) => ({ ...prev, hora: '' }));
   }, [selectedDate, peluquero]);
 
   // --- Manejadores de eventos ---
-
-  // Maneja cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError('');
   };
 
-  // Maneja la selección de fecha desde el datepicker
   const handleDateChange = (e) => {
     const newDate = e.target.value;
     setSelectedDate(newDate);
@@ -44,17 +43,14 @@ export default function Reserva({ peluquero }) {
     setError('');
   };
 
-  // Maneja la selección de hora (radio buttons)
   const handleHourChange = (e) => {
     setFormData((prev) => ({ ...prev, hora: e.target.value }));
     setError('');
   };
 
-  // Navega al siguiente paso del formulario
   const handleNextStep = () => {
-    setError(''); // Limpia errores antes de validar
+    setError('');
 
-    // Validar campos del Paso 1
     if (currentStep === 1) {
       if (!formData.fecha) {
         setError('Por favor, seleccione una fecha.');
@@ -70,43 +66,32 @@ export default function Reserva({ peluquero }) {
       }
     }
 
-    // Si la validación es exitosa, avanza al siguiente paso
     setCurrentStep((prev) => prev + 1);
   };
 
-  // Navega al paso anterior del formulario
   const handlePrevStep = () => {
     setCurrentStep((prev) => prev - 1);
-    setError(''); // Limpia errores al retroceder
+    setError('');
   };
 
   // --- Envío del formulario ---
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Limpia errores antes de enviar
+    setError('');
 
-    // Valida campos del Paso 2
     if (!formData.nombre || !formData.apellido || !formData.email || !formData.telefono) {
       setError('Por favor, completa todos los campos obligatorios (*).');
       return;
     }
 
-    // --- Lógica para guardar la reserva en la base de datos ---
-    // enviar los datos a tu backend
-
     try {
-      // Buscar ejemplo de cómo enviar los datos a un backend
-
-      
-      
-      // --- Simulación de éxito (eliminar en producción) ---
       console.log('Datos de la reserva a guardar:', {
         peluqueroId: peluquero.id,
         peluqueroNombre: peluquero.nombre,
         ...formData,
       });
 
-      // Redirigir a la página de confirmación con los datos de la reserva
+      // Redirigir a la página de confirmación
       router.push({
         pathname: '/confirmacion',
         query: {
@@ -119,16 +104,16 @@ export default function Reserva({ peluquero }) {
           clienteEmail: formData.email,
           clienteTelefono: formData.telefono,
           clienteRut: formData.rut,
+          reservaId: Math.random().toString(36).substr(2, 9).toUpperCase(), // ID temporal
         },
       });
     } catch (err) {
       console.error('Error al procesar la reserva:', err);
-      setError(err.message || 'Hubo un problema al agendar tu reserva. Inténtalo de nuevo.');
+      setError('Hubo un problema al agendar tu reserva. Inténtalo de nuevo.');
     }
   };
 
-  // --- Funciones de utilidad para el resumen ---
-  // Formatea la fecha
+  // --- Funciones de utilidad ---
   const formatDisplayDate = (dateString) => {
     if (!dateString) return '-';
     const [year, month, day] = dateString.split('-');
@@ -137,7 +122,6 @@ export default function Reserva({ peluquero }) {
     return `${parseInt(day)} de ${months[parseInt(month) - 1]} de ${year}`;
   };
 
-  // Obtiene el precio del servicio seleccionado
   const getServicePrice = (serviceName) => {
     if (peluquero && peluquero.precios && serviceName) {
       return `$${peluquero.precios[serviceName]}`;
@@ -145,7 +129,7 @@ export default function Reserva({ peluquero }) {
     return '-';
   };
 
-  // --- JSX de la página de reserva (utilizado por cambiar el html) ---
+  // --- JSX ---
   return (
     <section className="reserva-container">
       <h2>Reserva con {peluquero.nombre}</h2>
@@ -156,7 +140,6 @@ export default function Reserva({ peluquero }) {
         </a>
       </p>
 
-      {/* Mensaje de error */}
       {error && (
         <div className="error-message">
           <i className="fas fa-exclamation-circle"></i> {error}
@@ -175,9 +158,9 @@ export default function Reserva({ peluquero }) {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="reserva-form" id="reservaForm">
+      <form onSubmit={handleSubmit} className="reserva-form">
         {/* Paso 1: Fecha y Hora */}
-        <div className={`form-step ${currentStep === 1 ? 'active' : ''}`} id="step1">
+        <div className={`form-step ${currentStep === 1 ? 'active' : ''}`}>
           <div className="form-group">
             <label htmlFor="fecha">Fecha:</label>
             <input
@@ -214,7 +197,7 @@ export default function Reserva({ peluquero }) {
                           required
                         />
                         <label htmlFor={`hora-${hora}`}>
-                          {hora} - <span className="estado">{estado.replace('-', ' ').charAt(0).toUpperCase() + estado.slice(1)}</span>
+                          {hora} - <span className="estado">{estado.replace('-', ' ')}</span>
                         </label>
                       </div>
                     );
@@ -241,7 +224,7 @@ export default function Reserva({ peluquero }) {
                           required
                         />
                         <label htmlFor={`hora-${hora}`}>
-                          {hora} - <span className="estado">{estado.replace('-', ' ').charAt(0).toUpperCase() + estado.slice(1)}</span>
+                          {hora} - <span className="estado">{estado.replace('-', ' ')}</span>
                         </label>
                       </div>
                     );
@@ -269,7 +252,7 @@ export default function Reserva({ peluquero }) {
         </div>
 
         {/* Paso 2: Datos de Contacto */}
-        <div className={`form-step ${currentStep === 2 ? 'active' : ''}`} id="step2">
+        <div className={`form-step ${currentStep === 2 ? 'active' : ''}`}>
           <h3><i className="fas fa-user-edit"></i> Tus Datos</h3>
 
           <div className="form-group">
@@ -306,25 +289,25 @@ export default function Reserva({ peluquero }) {
         </div>
       </form>
 
-      {/* Resumen de la reserva*/}
+      {/* Resumen de la reserva */}
       <div className="reserva-summary">
         <h4>Resumen de tu reserva</h4>
         <div className="summary-content">
           <div className="summary-item">
             <strong>Servicio:</strong>
-            <span id="summary-servicio">{formData.servicio || '-'}</span>
+            <span>{formData.servicio || '-'}</span>
           </div>
           <div className="summary-item">
             <strong>Precio:</strong>
-            <span id="summary-precio">{getServicePrice(formData.servicio)}</span>
+            <span>{getServicePrice(formData.servicio)}</span>
           </div>
           <div className="summary-item">
             <strong>Fecha:</strong>
-            <span id="summary-fecha">{formatDisplayDate(formData.fecha)}</span>
+            <span>{formatDisplayDate(formData.fecha)}</span>
           </div>
           <div className="summary-item">
             <strong>Hora:</strong>
-            <span id="summary-hora">{formData.hora || '-'}</span>
+            <span>{formData.hora || '-'}</span>
           </div>
           <div className="summary-item">
             <strong>Barbero:</strong>
@@ -340,7 +323,7 @@ export default function Reserva({ peluquero }) {
   );
 }
 
-// getStaticPaths para definir rutas dinámicas
+// getStaticPaths y getStaticProps se mantienen igual...
 export async function getStaticPaths() {
   const peluqueroIds = ['1', '2'];
 
@@ -354,7 +337,6 @@ export async function getStaticPaths() {
   };
 }
 
-// getStaticProps para pasar datos al componente
 export async function getStaticProps({ params }) {
   const peluquerosData = [
     {

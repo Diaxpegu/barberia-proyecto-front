@@ -124,13 +124,12 @@ export default function Home() {
               <p>{about_info.descripcion}</p>
               <p>{about_info.historia}</p>
             </div>
-            <div className="about-image">
+            <div className="about-image video container">
               <video
                 src="/Interior.mp4"
-                width={350}
-                height={200}
                 controls
                 poster="/valiant.jpg"
+                className="full-cover-video"
               />
             </div>
           </div>

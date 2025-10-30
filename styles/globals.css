@@ -1673,3 +1673,24 @@ footer {
         justify-content: center;
     }
 }
+/* Estilos para el contenedor del video */
+.about-image,
+.video-container {
+    position: relative; 
+    width: 100%;
+    height: 300px;
+    border-radius: 8px;
+    overflow: hidden; 
+    box-shadow: var(--shadow);
+    margin: 0 auto; 
+}
+/* Estilos para que el video abarque todo el espacio del contenedor */
+.full-cover-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    display: block; 
+}
