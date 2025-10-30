@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router'; // AÑADE ESTA IMPORTACIÓN
+import { useRouter } from 'next/router';
 
 export default function Reserva({ peluquero }) {
-  const router = useRouter(); // AÑADE ESTO
+  const router = useRouter();
   
   // --- Estados del formulario y la UI ---
   const [formData, setFormData] = useState({
-    fecha: '',
-    hora: '',
-    servicio: '',
-    nombre: '',
-    apellido: '',
-    email: '',
-    telefono: '',
-    rut: '',
+    fecha: "",
+    hora: "",
+    servicio: "",
+    nombre: "",
+    apellido: "",
+    email: "",
+    telefono: "",
+    rut: "",
   });
   const [currentStep, setCurrentStep] = useState(1);
-  const [error, setError] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+  const [error, setError] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
   const [availableHours, setAvailableHours] = useState({});
 
   useEffect(() => {
@@ -33,39 +33,32 @@ export default function Reserva({ peluquero }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError('');
+    setError("");
   };
 
   const handleDateChange = (e) => {
     const newDate = e.target.value;
     setSelectedDate(newDate);
     setFormData((prev) => ({ ...prev, fecha: newDate }));
-    setError('');
+    setError("");
   };
 
   const handleHourChange = (e) => {
     setFormData((prev) => ({ ...prev, hora: e.target.value }));
-    setError('');
+    setError("");
   };
 
   const handleNextStep = () => {
     setError('');
 
     if (currentStep === 1) {
-      if (!formData.fecha) {
-        setError('Por favor, seleccione una fecha.');
-        return;
-      }
-      if (!formData.hora) {
-        setError('Por favor, seleccione un horario.');
-        return;
-      }
-      if (!formData.servicio) {
-        setError('Por favor, seleccione un servicio.');
-        return;
-      }
+      if (!formData.fecha)
+        return setError("Por favor, seleccione una fecha.");
+      if (!formData.hora)
+        return setError("Por favor, seleccione un horario.");
+      if (!formData.servicio)
+        return setError("Por favor, seleccione un servicio.");
     }
-
     setCurrentStep((prev) => prev + 1);
   };
 
@@ -74,7 +67,6 @@ export default function Reserva({ peluquero }) {
     setError('');
   };
 
-  // --- Envío del formulario ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -93,7 +85,7 @@ export default function Reserva({ peluquero }) {
 
       // Redirigir a la página de confirmación
       router.push({
-        pathname: '/confirmacion',
+        pathname: "/confirmacion",
         query: {
           peluqueroNombre: peluquero.nombre,
           servicio: formData.servicio,
@@ -115,10 +107,22 @@ export default function Reserva({ peluquero }) {
 
   // --- Funciones de utilidad ---
   const formatDisplayDate = (dateString) => {
-    if (!dateString) return '-';
-    const [year, month, day] = dateString.split('-');
-    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    if (!dateString) return "-";
+    const [year, month, day] = dateString.split("-");
+    const months = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
     return `${parseInt(day)} de ${months[parseInt(month) - 1]} de ${year}`;
   };
 
@@ -126,7 +130,7 @@ export default function Reserva({ peluquero }) {
     if (peluquero && peluquero.precios && serviceName) {
       return `$${peluquero.precios[serviceName]}`;
     }
-    return '-';
+    return "-";
   };
 
   // --- JSX ---
@@ -135,7 +139,11 @@ export default function Reserva({ peluquero }) {
       <h2>Reserva con {peluquero.nombre}</h2>
       <p className="instagram">
         <i className="fab fa-instagram"></i>
-        <a href={`https://instagram.com/${peluquero.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer">
+        <a
+          href={`https://instagram.com/${peluquero.instagram.replace("@", "")}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {peluquero.instagram}
         </a>
       </p>
@@ -325,99 +333,48 @@ export default function Reserva({ peluquero }) {
 
 // getStaticPaths y getStaticProps se mantienen igual...
 export async function getStaticPaths() {
-  const peluqueroIds = ['1', '2'];
-
-  const paths = peluqueroIds.map((id) => ({
-    params: { id },
-  }));
-
-  return {
-    paths,
-    fallback: false,
-  };
+  const peluqueroIds = ["1", "2"];
+  const paths = peluqueroIds.map((id) => ({ params: { id } }));
+  return { paths, fallback: false };
 }
 
 export async function getStaticProps({ params }) {
   const peluquerosData = [
     {
-      id: '1',
-      nombre: 'Lucas Aldair',
-      instagram: 'lukas__aldair',
-      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
+      id: "1",
+      nombre: "Lucas Aldair",
+      instagram: "lukas__aldair",
+      servicios: ["Corte básico", "Corte premium", "Tintura", "Lavado", "Peinado"],
       precios: {
-        'Corte básico': 15000,
-        'Corte premium': 20000,
+        "Corte básico": 15000,
+        "Corte premium": 20000,
         Tintura: 25000,
         Lavado: 5000,
         Peinado: 10000,
       },
       horarios: {
-        '2023-11-20': {
-          '08:00': 'disponible',
-          '09:00': 'disponible',
-          '10:00': 'ocupado',
-          '11:00': 'disponible',
-          '12:00': 'disponible',
-          '13:00': 'disponible',
-          '14:00': 'ocupado',
-          '15:00': 'disponible',
-          '16:00': 'disponible',
-          '17:00': 'disponible',
-        },
-        '2023-11-21': {
-          '08:00': 'disponible',
-          '09:00': 'disponible',
-          '10:00': 'disponible',
-          '11:00': 'disponible',
-          '12:00': 'disponible',
-          '13:00': 'disponible',
-          '14:00': 'disponible',
-          '15:00': 'disponible',
-          '16:00': 'disponible',
-          '17:00': 'disponible',
-        },
+        "2025-10-23": { "08:00": "disponible", "09:00": "disponible" },
       },
     },
     {
-      id: '2',
-      nombre: 'Alejandro',
-      instagram: 'ale_.cut',
-      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
+      id: "2",
+      nombre: "Alejandro",
+      instagram: "ale_.cut",
+      servicios: ["Corte básico", "Corte premium", "Tintura", "Lavado", "Peinado"],
       precios: {
-        'Corte básico': 15000,
-        'Corte premium': 20000,
+        "Corte básico": 15000,
+        "Corte premium": 20000,
         Tintura: 25000,
         Lavado: 5000,
         Peinado: 10000,
       },
       horarios: {
-        '2023-11-20': {
-          '08:00': 'disponible',
-          '09:00': 'ocupado',
-          '10:00': 'disponible',
-          '11:00': 'disponible',
-          '12:00': 'disponible',
-          '13:00': 'ocupado',
-          '14:00': 'disponible',
-          '15:00': 'disponible',
-          '16:00': 'disponible',
-          '17:00': 'disponible',
-        },
+        "2025-10-23": { "08:00": "disponible", "09:00": "ocupado" },
       },
     },
   ];
 
   const peluquero = peluquerosData.find((p) => p.id === params.id);
-
-  if (!peluquero) {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: {
-      peluquero,
-    },
-  };
+  if (!peluquero) return { notFound: true };
+  return { props: { peluquero } };
 }

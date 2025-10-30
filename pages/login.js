@@ -8,16 +8,30 @@ export default function Login() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (Nombre === 'Admin' && Contraseña === 'SuperAdmin') {
-      //aquí solo redirigimos
-      localStorage.setItem('isAdminLoggedIn', 'true');
-      router.push('/Panel-Admin');
-    } else {
-      setError('Usuario o contraseña incorrectos.');
+    try {
+      const res = await fetch('https://back-production-57ce.up.railway.app/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: Nombre, password: Contraseña })
+      });
+
+      if (res.ok) {
+        // Login exitoso
+        localStorage.setItem('isAdminLoggedIn', 'true');
+        router.push('/Panel-Admin');
+      } else {
+        const data = await res.json();
+        setError(data.detail || 'Usuario o contraseña incorrectos');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Error de conexión con el servidor');
     }
   };
 
@@ -41,7 +55,7 @@ export default function Login() {
           <div className="form-group">
             <label htmlFor="Contraseña">Contraseña:</label>
             <input
-              type="Contraseña"
+              type="password"
               id="Contraseña"
               name="Contraseña"
               value={Contraseña}
