@@ -1,134 +1,208 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import Link from 'next/link';
 
 export default function AdminPanel() {
-  const [panelActivo, setPanelActivo] = useState(null); // Panel que se muestra
-  const [data, setData] = useState([]);
-  const [columns, setColumns] = useState([]);
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [jefes, setJefes] = useState([]);
+  const [showJefes, setShowJefes] = useState(false);
+  const [showAddJefe, setShowAddJefe] = useState(false);
+  const [newJefe, setNewJefe] = useState({
+    nombre: '',
+    usuario: '',
+    contrasena: '',
+    rol: 'Jefe de barberos'
+  });
 
-  const backendUrl = 'https://back-production-57ce.up.railway.app';
+  useEffect(() => {
+    const isAdmin = localStorage.getItem('isAdminLoggedIn');
+    const userData = localStorage.getItem('user');
+    
+    if (isAdmin === 'true' && userData) {
+      setIsLoggedIn(true);
+      setUser(JSON.parse(userData));
+    } else {
+      router.push('/login');
+    }
+  }, [router]);
 
-  const fetchData = async (endpoint, panel) => {
+  const cargarJefes = async () => {
     try {
-      const res = await fetch(`${backendUrl}${endpoint}`);
-      const jsonData = await res.json();
-      setColumns(jsonData.length > 0 ? Object.keys(jsonData[0]) : []);
-      setData(jsonData);
-      setPanelActivo(panel); // Abrir el panel correspondiente
-    } catch (err) {
-      console.error(err);
-      alert('Error al obtener los datos');
+      const response = await fetch('/api/jefes');
+      const data = await response.json();
+      if (response.ok) {
+        setJefes(data.jefes);
+      }
+    } catch (error) {
+      console.error('Error cargando jefes:', error);
     }
   };
 
-  // Funciones para cada botón
-  const mostrarClientes = () => fetchData('/clientes/', 'clientes');
-  const mostrarBarberos = () => fetchData('/barberos/', 'barberos');
-  const mostrarServicios = () => fetchData('/servicios/', 'servicios');
-  const mostrarProductos = () => fetchData('/productos/', 'productos');
-  const mostrarDisponibilidad = () => fetchData('/disponibilidad/libre/', 'disponibilidad');
-  const mostrarReservasPendientes = () => fetchData('/reservas/pendientes/', 'reservasPendientes');
-  const mostrarReservasDetalle = () => fetchData('/reservas/detalle/', 'reservasDetalle');
-
-  const bloquearHorario = async () => {
-    const id = prompt("Ingrese ID de disponibilidad a bloquear:");
-    if (!id) return;
+  const handleAddJefe = async (e) => {
+    e.preventDefault();
     try {
-      const res = await fetch(`${backendUrl}/disponibilidad/bloquear/${id}`, { method: 'PUT' });
-      const result = await res.json();
-      alert(result.mensaje);
-    } catch (err) {
-      console.error(err);
-      alert('Error al bloquear horario');
+      const response = await fetch('/api/jefes/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newJefe),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Jefe agregado exitosamente');
+        setNewJefe({ nombre: '', usuario: '', contrasena: '', rol: 'Jefe de barberos' });
+        setShowAddJefe(false);
+        cargarJefes(); // Recargar la lista
+      } else {
+        alert(data.message || 'Error al agregar jefe');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error de conexión');
     }
   };
 
-  const confirmarReserva = async () => {
-    const id = prompt("Ingrese ID de reserva a confirmar:");
-    if (!id) return;
-    try {
-      const res = await fetch(`${backendUrl}/reservas/confirmar/${id}`, { method: 'PUT' });
-      const result = await res.json();
-      alert(result.mensaje);
-    } catch (err) {
-      console.error(err);
-      alert('Error al confirmar reserva');
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('isAdminLoggedIn');
+    localStorage.removeItem('user');
+    router.push('/login');
   };
 
-  const cancelarReserva = async () => {
-    const id = prompt("Ingrese ID de reserva a cancelar:");
-    if (!id) return;
-    try {
-      const res = await fetch(`${backendUrl}/reservas/cancelar/${id}`, { method: 'DELETE' });
-      const result = await res.json();
-      alert(result.mensaje);
-    } catch (err) {
-      console.error(err);
-      alert('Error al cancelar reserva');
-    }
-  };
-
-  // Render de paneles dinámicos
-  const renderPanel = () => {
-    if (!panelActivo) return <p>Seleccione una consulta para ver los resultados.</p>;
+  if (!isLoggedIn) {
     return (
-      <div className="admin-subpanel">
-        <h3>
-          {panelActivo === 'clientes' && 'Clientes Registrados'}
-          {panelActivo === 'barberos' && 'Barberos Disponibles'}
-          {panelActivo === 'servicios' && 'Servicios y Precios'}
-          {panelActivo === 'productos' && 'Productos y Precios'}
-          {panelActivo === 'disponibilidad' && 'Bloques de Disponibilidad Libres'}
-          {panelActivo === 'reservasPendientes' && 'Reservas Pendientes'}
-          {panelActivo === 'reservasDetalle' && 'Todas las Reservas - Detalle Completo'}
-        </h3>
-        {data.length === 0 ? (
-          <p>No hay datos para mostrar</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                {columns.map((col) => <th key={col}>{col}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((row, idx) => (
-                <tr key={idx}>
-                  {columns.map((col) => <td key={col}>{row[col]}</td>)}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      <div className="loading-container">
+        <p>Verificando autenticación...</p>
       </div>
     );
-  };
+  }
 
   return (
     <section className="admin-panel-container">
       <h2>Panel de Administración</h2>
+      <p>Bienvenido, {user?.nombre || user?.username || 'Administrador'}.</p>
 
       <div className="admin-actions-grid">
-        <button className="admin-btn" onClick={mostrarClientes}>Mostrar Clientes</button>
-        <button className="admin-btn" onClick={mostrarBarberos}>Mostrar Barberos</button>
-        <button className="admin-btn" onClick={mostrarServicios}>Servicios y Precios</button>
-        <button className="admin-btn" onClick={mostrarProductos}>Productos y Precios</button>
-        <button className="admin-btn" onClick={mostrarDisponibilidad}>Disponibilidad Libre</button>
-        <button className="admin-btn" onClick={mostrarReservasPendientes}>Reservas Pendientes</button>
-        <button className="admin-btn" onClick={bloquearHorario}>Bloquear Horario</button>
-        <button className="admin-btn" onClick={confirmarReserva}>Confirmar Reserva</button>
-        <button className="admin-btn" onClick={cancelarReserva}>Cancelar Reserva</button>
-        <button className="admin-btn" onClick={mostrarReservasDetalle}>Detalle Completo Reservas</button>
+        <button 
+          className="admin-btn" 
+          onClick={() => {
+            setShowJefes(!showJefes);
+            if (!showJefes) cargarJefes();
+          }}
+        >
+          <i className="fas fa-users"></i> 
+          {showJefes ? 'Ocultar Jefes' : 'Mostrar Jefes Registrados'}
+        </button>
+
+        <button 
+          className="admin-btn"
+          onClick={() => setShowAddJefe(true)}
+        >
+          <i className="fas fa-user-plus"></i> Agregar Nuevo Jefe
+        </button>
+
+        <button className="admin-btn">
+          <i className="fas fa-cut"></i> Mostrar Barberos Disponibles
+        </button>
+
+        <button className="admin-btn">
+          <i className="fas fa-book-open"></i> Catálogo de Servicios y Precios
+        </button>
+
+        {/* ... otros botones existentes */}
       </div>
 
-      {/* Panel dinámico */}
-      <div className="admin-panel-display">
-        {renderPanel()}
-      </div>
+      {/* Lista de Jefes */}
+      {showJefes && (
+        <div className="jefes-section">
+          <h3>Jefes Registrados</h3>
+          <div className="jefes-list">
+            {jefes.map(jefe => (
+              <div key={jefe._id} className="jefe-card">
+                <h4>{jefe.nombre}</h4>
+                <p><strong>Usuario:</strong> {jefe.usuario}</p>
+                <p><strong>Rol:</strong> {jefe.rol}</p>
+                <p><strong>Fecha creación:</strong> {new Date(jefe.fechaCreacion).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Modal para agregar nuevo jefe */}
+      {showAddJefe && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Agregar Nuevo Jefe</h3>
+            <form onSubmit={handleAddJefe}>
+              <div className="form-group">
+                <label>Nombre completo:</label>
+                <input
+                  type="text"
+                  value={newJefe.nombre}
+                  onChange={(e) => setNewJefe({...newJefe, nombre: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Usuario:</label>
+                <input
+                  type="text"
+                  value={newJefe.usuario}
+                  onChange={(e) => setNewJefe({...newJefe, usuario: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Contraseña:</label>
+                <input
+                  type="password"
+                  value={newJefe.contrasena}
+                  onChange={(e) => setNewJefe({...newJefe, contrasena: e.target.value})}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Rol:</label>
+                <select
+                  value={newJefe.rol}
+                  onChange={(e) => setNewJefe({...newJefe, rol: e.target.value})}
+                >
+                  <option value="Jefe de barberos">Jefe de barberos</option>
+                  <option value="Administrador">Administrador</option>
+                  <option value="Supervisor">Supervisor</option>
+                </select>
+              </div>
+              <div className="modal-actions">
+                <button type="submit" className="btn-confirmar">
+                  Agregar Jefe
+                </button>
+                <button 
+                  type="button" 
+                  className="btn-cancelar"
+                  onClick={() => setShowAddJefe(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="admin-footer-actions">
-        <Link href="/"><a className="btn-back-home">Volver al Inicio</a></Link>
+        <button onClick={handleLogout} className="btn-logout">
+          <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
+        <Link href="/">
+          <a className="btn-back-home">
+            <i className="fas fa-home"></i> Volver al Inicio
+          </a>
+        </Link>
       </div>
     </section>
   );
