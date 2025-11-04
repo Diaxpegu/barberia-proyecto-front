@@ -16,16 +16,11 @@ export default function Login() {
     e.preventDefault();
     setError('');
 
-    console.log("Enviando login a:", `${backendUrl}/login/`);
-
     try {
       const res = await fetch(`${backendUrl}/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          usuario: usuario,
-          contrasena: contrasena
-        }),
+        body: JSON.stringify({ usuario, contrasena }),
       });
 
       const data = await res.json();
@@ -35,11 +30,16 @@ export default function Login() {
         return;
       }
 
-      // ✅ Guardar sesión de admin
-      localStorage.setItem('isAdminLoggedIn', 'true');
+      localStorage.setItem('usuario', data.usuario);
+      localStorage.setItem('rol', data.rol);
 
       alert('Login exitoso ✅');
-      router.push('/Panel-Admin'); // redirigir
+
+      if (data.rol === 'admin') {
+        router.push('/Panel-Admin');
+      } else if (data.rol === 'barbero') {
+        router.push('/Panel-Barbero');
+      }
     } catch (err) {
       console.error(err);
       setError('Error al conectar con el servidor');
@@ -49,7 +49,7 @@ export default function Login() {
   return (
     <section className="login-container">
       <div className="login-box">
-        <h2>Acceso de Administrador</h2>
+        <h2>Acceso de Administrador o Barbero</h2>
 
         {error && <div className="error-message">{error}</div>}
 
