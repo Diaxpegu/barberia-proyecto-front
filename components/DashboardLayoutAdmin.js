@@ -1,119 +1,74 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-export default function DashboardLayoutAdmin({ children, usuario }) {
+export default function DashboardLayoutAdmin({ usuario, children }) {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("rol");
+    localStorage.removeItem("barberUser");
+    localStorage.removeItem("barberId");
     router.push("/login");
   };
 
   return (
-    <div className="dashboard-layout">
+    <div className="dashboard-container">
       <aside className="sidebar">
-        <div className="logo-box">
-          <img src="/valiant.jpg" alt="Logo" className="logo" />
-          <h3>Valiant Admin</h3>
-        </div>
-
+        <h2>Admin Panel</h2>
+        <p className="user-info">👤 {usuario}</p>
         <nav>
-          <Link href="/Panel-Admin" className="nav-btn">🏠 Inicio</Link>
-          <Link href="/Panel-Admin/barberos" className="nav-btn">💈 Barberos</Link>
-          <Link href="/Panel-Admin/servicios" className="nav-btn">✂️ Servicios</Link>
-          <Link href="/Panel-Admin/clientes" className="nav-btn">👥 Clientes</Link>
-          <Link href="/Panel-Admin/reservas" className="nav-btn">📅 Reservas</Link>
-          <Link href="/Panel-Admin/reportes" className="nav-btn">📊 Reportes</Link>
-          <Link href="/Panel-Admin/configuracion" className="nav-btn">⚙️ Configuración</Link>
+          <Link href="/Panel-Admin">🏠 Inicio</Link>
+          <Link href="/Panel-Admin/barberos">💈 Barberos</Link>
+          <Link href="/Panel-Admin/clientes">👥 Clientes</Link>
+          <Link href="/Panel-Admin/servicios">✂️ Servicios</Link>
+          <Link href="/Panel-Admin/reservas">📅 Reservas</Link>
+          <Link href="/Panel-Admin/reportes">📊 Reportes</Link>
+          <Link href="/Panel-Admin/configuracion">⚙️ Configuración</Link>
         </nav>
-
-        <div className="sidebar-footer">
-          <button onClick={handleLogout} className="btn-salir">Salir</button>
-          <Link href="/" className="btn-volver">← Volver al inicio</Link>
-        </div>
+        <button onClick={handleLogout} className="btn-logout">
+          🚪 Cerrar Sesión
+        </button>
       </aside>
 
-      <main className="contenido">
-        <header className="dashboard-header">
-          <h2>Panel Administrativo</h2>
-          <p>{usuario ? `Bienvenido, ${usuario}` : "Administrador"}</p>
-        </header>
-
-        <section className="dashboard-content">{children}</section>
-      </main>
+      <main className="dashboard-content">{children}</main>
 
       <style jsx>{`
-        .dashboard-layout {
+        .dashboard-container {
           display: flex;
-          height: 100vh;
-          font-family: 'Poppins', sans-serif;
+          min-height: 100vh;
+          background: #f9fafb;
         }
         .sidebar {
-          width: 260px;
-          background: #212529;
-          color: #fff;
+          width: 240px;
+          background: #111827;
+          color: white;
+          padding: 1.5rem;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
-          padding: 1rem;
-        }
-        .logo-box {
-          text-align: center;
-        }
-        .logo {
-          width: 80px;
-          height: 80px;
-          border-radius: 50%;
-          margin-bottom: 0.5rem;
         }
         nav {
           display: flex;
           flex-direction: column;
-          gap: 0.6rem;
+          gap: 0.8rem;
         }
-        .nav-btn {
-          padding: 0.6rem 1rem;
-          border-radius: 6px;
-          background: transparent;
-          color: #fff;
+        nav a {
+          color: #e5e7eb;
           text-decoration: none;
-          transition: background 0.3s;
+          transition: color 0.2s;
         }
-        .nav-btn:hover {
-          background: #495057;
+        nav a:hover {
+          color: #60a5fa;
         }
-        .sidebar-footer {
-          display: flex;
-          flex-direction: column;
-          gap: 0.4rem;
-        }
-        .btn-salir {
-          background: #dc3545;
-          border: none;
+        .btn-logout {
+          background: #ef4444;
           color: white;
+          border: none;
           padding: 0.6rem;
           border-radius: 6px;
           cursor: pointer;
-        }
-        .btn-volver {
-          text-align: center;
-          color: #adb5bd;
-          font-size: 0.9rem;
-        }
-        .contenido {
-          flex: 1;
-          background: #f8f9fa;
-          overflow-y: auto;
-          display: flex;
-          flex-direction: column;
-        }
-        .dashboard-header {
-          padding: 1rem 2rem;
-          background: white;
-          border-bottom: 1px solid #dee2e6;
-        }
-        .dashboard-content {
-          padding: 2rem;
+          margin-top: 2rem;
         }
       `}</style>
     </div>
