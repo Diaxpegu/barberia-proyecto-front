@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import DashboardLayoutBarbero from "@/components/DashboardLayoutBarbero";
-import DataTable from "@/components/DataTable";
+import DashboardLayoutBarbero from "../../components/DashboardLayoutBarbero";
+import DataTable from "../../components/DataTable";
 
 export default function PanelBarbero() {
   const backendUrl =

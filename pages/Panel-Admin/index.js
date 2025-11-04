@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import DashboardLayoutAdmin from "@/components/DashboardLayoutAdmin";
+import DashboardLayoutAdmin from "../../components/DashboardLayoutAdmin";
 
 export default function PanelAdmin() {
   const backendUrl =
