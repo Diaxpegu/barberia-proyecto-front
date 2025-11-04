@@ -1,47 +1,77 @@
-export default function DataTable({ data, columnas }) {
-  if (!data || data.length === 0) return <p>No hay datos disponibles.</p>;
+export default function DataTable({ columnas = [], data = [] }) {
+  const safeCols = columnas.filter((c) => c !== "_id" && c !== "contrasena");
 
   return (
-    <table className="tabla-datos">
-      <thead>
-        <tr>
-          {columnas.map((col) => (
-            <th key={col}>{col.replaceAll("_", " ")}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((fila, i) => (
-          <tr key={i}>
-            {columnas.map((col) => (
-              <td key={col}>{String(fila[col] ?? "-")}</td>
+    <div className="tabla-wrap">
+      <table className="tabla">
+        <thead>
+          <tr>
+            {safeCols.map((c) => (
+              <th key={c}>{formatearCabecera(c)}</th>
             ))}
           </tr>
-        ))}
-      </tbody>
+        </thead>
+        <tbody>
+          {data.length === 0 ? (
+            <tr>
+              <td colSpan={safeCols.length} className="no-data">
+                No hay datos disponibles.
+              </td>
+            </tr>
+          ) : (
+            data.map((row, i) => (
+              <tr key={row._id || i}>
+                {safeCols.map((c) => (
+                  <td key={c}>{renderCell(row[c])}</td>
+                ))}
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
       <style jsx>{`
-        .tabla-datos {
+        .tabla-wrap {
+          background: #fff;
+          border-radius: 14px;
+          box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+          overflow: hidden;
+        }
+        .tabla {
           width: 100%;
           border-collapse: collapse;
-          background: white;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
         th {
-          background: #343a40;
-          color: white;
-          padding: 0.6rem;
-          text-transform: capitalize;
+          text-align: left;
+          background: #111827;
+          color: #fff;
+          padding: 14px;
+          font-weight: 600;
+          font-size: 14px;
+          letter-spacing: 0.3px;
         }
         td {
-          padding: 0.5rem;
-          border-bottom: 1px solid #ddd;
+          padding: 12px 14px;
+          border-top: 1px solid #eef1f5;
         }
-        tr:hover td {
-          background: #f1f3f5;
+        .no-data {
+          text-align: center;
+          padding: 24px;
+          color: #6b7280;
         }
       `}</style>
-    </table>
+    </div>
   );
+}
+
+function renderCell(v) {
+  if (v === null || v === undefined || v === "") return "-";
+  if (Array.isArray(v)) return v.join(", ");
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+}
+function formatearCabecera(s) {
+  return s
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (m) => m.toUpperCase());
 }

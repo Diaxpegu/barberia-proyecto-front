@@ -1,70 +1,89 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-export default function DashboardLayoutBarbero({ usuario, children }) {
+export default function DashboardLayoutBarbero({ usuario = "Barbero", children }) {
   const router = useRouter();
 
-  const handleLogout = () => {
-    localStorage.removeItem("usuario");
-    localStorage.removeItem("rol");
-    localStorage.removeItem("barberUser");
-    localStorage.removeItem("barberId");
+  const logout = () => {
+    try {
+      localStorage.removeItem("usuario");
+      localStorage.removeItem("rol");
+      localStorage.removeItem("barberUser");
+      localStorage.removeItem("barberId");
+    } catch (_) {}
     router.push("/login");
   };
 
   return (
-    <div className="dashboard-container">
+    <div className="dash-wrap">
       <aside className="sidebar">
-        <h2>Panel Barbero</h2>
-        <p className="user-info">✂️ {usuario}</p>
-        <nav>
-          <Link href="/Panel-Barbero">📅 Mi Agenda</Link>
-          <Link href="/Panel-Barbero/historial">📖 Historial</Link>
-          <Link href="/Panel-Barbero/perfil">👤 Perfil</Link>
+        <div className="brand">
+          <Link href="/Panel-Barbero">VALIANT • Barbero</Link>
+          <small>@{usuario}</small>
+        </div>
+
+        <nav className="menu">
+          <Link href="/Panel-Barbero">Agenda</Link>
+          <Link href="/Panel-Barbero/historial">Historial</Link>
+          <Link href="/Panel-Barbero/perfil">Perfil</Link>
         </nav>
-        <button onClick={handleLogout} className="btn-logout">
-          🚪 Cerrar Sesión
+
+        <button className="btn-logout" onClick={logout}>
+          Cerrar sesión
         </button>
       </aside>
 
-      <main className="dashboard-content">{children}</main>
+      <main className="content">{children}</main>
 
       <style jsx>{`
-        .dashboard-container {
-          display: flex;
+        .dash-wrap {
+          display: grid;
+          grid-template-columns: 260px 1fr;
           min-height: 100vh;
-          background: #f3f4f6;
+          background: #f7f8fb;
         }
         .sidebar {
-          width: 240px;
-          background: #1e3a8a;
-          color: white;
-          padding: 1.5rem;
+          background: #111827;
+          color: #fff;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
+          padding: 20px;
+          gap: 24px;
         }
-        nav {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
+        .brand a {
+          color: #fff;
+          font-weight: 700;
+          font-size: 18px;
         }
-        nav a {
-          color: #dbeafe;
-          text-decoration: none;
-          font-weight: 500;
-          transition: color 0.2s;
+        .brand small {
+          display: block;
+          opacity: 0.7;
+          margin-top: 6px;
         }
-        nav a:hover {
-          color: #93c5fd;
+        .menu {
+          display: grid;
+          gap: 10px;
+        }
+        .menu a {
+          color: #e5e7eb;
+          padding: 10px 12px;
+          border-radius: 8px;
+          transition: 0.15s;
+        }
+        .menu a:hover {
+          background: #1f2937;
         }
         .btn-logout {
+          margin-top: auto;
           background: #ef4444;
-          color: white;
-          border: none;
-          padding: 0.6rem;
-          border-radius: 6px;
+          border: 0;
+          color: #fff;
+          padding: 10px 12px;
+          border-radius: 8px;
           cursor: pointer;
+        }
+        .content {
+          padding: 28px 32px;
         }
       `}</style>
     </div>

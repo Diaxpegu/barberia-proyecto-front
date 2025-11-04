@@ -1,36 +1,39 @@
 import DashboardLayoutAdmin from "../../components/DashboardLayoutAdmin";
 
 export default function ConfiguracionAdmin() {
+  const backendUrl =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    "https://barberia-proyecto-back-production-f876.up.railway.app";
+
+  const regenerar = async () => {
+    alert("Esta acción requiere un endpoint de mantenimiento (no crítico).");
+  };
+
   return (
     <DashboardLayoutAdmin usuario="Administrador">
-      <h2>Configuración General</h2>
-      <p>Gestión de parámetros globales del sistema.</p>
+      <h2>Configuración</h2>
+      <p>Opciones generales del sistema.</p>
 
-      <div className="config-card">
-        <h3>Opciones</h3>
-        <ul>
-          <li>Editar horarios globales</li>
-          <li>Gestionar permisos de usuarios</li>
-          <li>Exportar datos a CSV o Excel</li>
-          <li>Reiniciar disponibilidad semanal</li>
-        </ul>
+      <div className="box">
+        <h4>Mantenimiento</h4>
+        <button onClick={regenerar}>Regenerar disponibilidades (demo)</button>
       </div>
 
       <style jsx>{`
-        .config-card {
-          background: white;
-          padding: 1.5rem;
+        .box {
+          background: #fff;
           border-radius: 12px;
-          margin-top: 1rem;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+          padding: 16px;
+          margin-top: 16px;
+          box-shadow: 0 8px 18px rgba(0,0,0,0.05);
         }
-        ul {
-          margin-top: 1rem;
-          list-style: disc;
-          margin-left: 2rem;
-        }
-        li {
-          padding: 0.4rem 0;
+        button {
+          background: #6366f1;
+          border: 0;
+          color: #fff;
+          padding: 10px 12px;
+          border-radius: 8px;
+          cursor: pointer;
         }
       `}</style>
     </DashboardLayoutAdmin>

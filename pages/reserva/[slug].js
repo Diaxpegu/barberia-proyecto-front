@@ -7,18 +7,18 @@ export default function Reserva() {
 
   const [peluquero, setPeluquero] = useState(null);
   const [formData, setFormData] = useState({
-    fecha: "",
-    hora: "",
-    servicio: "",
-    nombre: "",
-    apellido: "",
-    email: "",
-    telefono: "",
-    rut: "",
+    fecha: '',
+    hora: '',
+    servicio: '',
+    nombre: '',
+    apellido: '',
+    email: '',
+    telefono: '',
+    rut: '',
   });
   const [currentStep, setCurrentStep] = useState(1);
-  const [error, setError] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [error, setError] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
   const [availableHours, setAvailableHours] = useState({});
 
   const backendUrl =
@@ -33,13 +33,11 @@ export default function Reserva() {
         const resBarberos = await fetch(`${backendUrl}/barberos/`);
         const todos = await resBarberos.json();
         const barberoEncontrado = todos.find(
-          (b) =>
-            b.nombre.toLowerCase().replace(/\s+/g, '-') === slug.toLowerCase()
+          (b) => b.nombre.toLowerCase().replace(/\s+/g, '-') === slug.toLowerCase()
         );
 
         if (!barberoEncontrado) {
-          setError("Barbero no encontrado.");
-          setPeluquero(null);
+          setError('Barbero no encontrado.');
           return;
         }
 
@@ -57,25 +55,23 @@ export default function Reserva() {
         setPeluquero({
           ...barberoEncontrado,
           horarios: formateado,
-          servicios: ["Corte básico", "Corte premium", "Tintura", "Lavado", "Peinado"],
+          servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
           precios: {
-            "Corte básico": 15000,
-            "Corte premium": 20000,
+            'Corte básico': 15000,
+            'Corte premium': 20000,
             Tintura: 25000,
             Lavado: 5000,
             Peinado: 10000,
           },
         });
       } catch (err) {
-        console.error("Error al cargar barbero:", err);
-        setError("Error al cargar datos del barbero.");
-        setPeluquero(null);
+        console.error('Error al cargar barbero:', err);
+        setError('Error al cargar datos del barbero.');
       }
     };
 
     cargarBarbero();
-  }, [slug, backendUrl]); 
-
+  }, [slug, backendUrl]);
 
   useEffect(() => {
     if (selectedDate && peluquero && peluquero.horarios[selectedDate]) {
@@ -83,64 +79,64 @@ export default function Reserva() {
     } else {
       setAvailableHours({});
     }
-    setFormData((prev) => ({ ...prev, hora: "" }));
+    setFormData((prev) => ({ ...prev, hora: '' }));
   }, [selectedDate, peluquero]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError("");
+    setError('');
   };
 
   const handleDateChange = (e) => {
     const newDate = e.target.value;
     setSelectedDate(newDate);
     setFormData((prev) => ({ ...prev, fecha: newDate }));
-    setError("");
+    setError('');
   };
 
   const handleHourChange = (e) => {
     setFormData((prev) => ({ ...prev, hora: e.target.value }));
-    setError("");
+    setError('');
   };
 
   const handleNextStep = () => {
-    setError("");
+    setError('');
     if (currentStep === 1) {
-      if (!formData.fecha) return setError("Por favor, seleccione una fecha.");
-      if (!formData.hora) return setError("Por favor, seleccione un horario.");
-      if (!formData.servicio) return setError("Por favor, seleccione un servicio.");
+      if (!formData.fecha) return setError('Por favor, seleccione una fecha.');
+      if (!formData.hora) return setError('Por favor, seleccione un horario.');
+      if (!formData.servicio) return setError('Por favor, seleccione un servicio.');
     }
     setCurrentStep((prev) => prev + 1);
   };
 
   const handlePrevStep = () => {
     setCurrentStep((prev) => prev - 1);
-    setError("");
+    setError('');
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setError('');
 
     if (!formData.nombre || !formData.apellido || !formData.email || !formData.telefono) {
-      setError("Por favor, completa todos los campos obligatorios (*).");
+      setError('Por favor, completa todos los campos obligatorios (*).');
       return;
     }
 
-
     const datosReserva = {
-      id_cliente: "CLIENTE_TEMPORAL", 
       id_barbero: peluquero._id,
-      id_servicio: formData.servicio,
       fecha: formData.fecha,
       hora: formData.hora,
-      estado: "agendado" 
+      nombre_cliente: formData.nombre,
+      apellido_cliente: formData.apellido,
+      email_cliente: formData.email,
+      telefono_cliente: formData.telefono,
+      rut_cliente: formData.rut,
+      servicio_nombre: formData.servicio,
     };
 
     try {
-
       const res = await fetch(`${backendUrl}/reservas/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -149,12 +145,11 @@ export default function Reserva() {
 
       const resultado = await res.json();
       if (!res.ok) {
-        throw new Error(resultado.detail || "Error al guardar la reserva");
+        throw new Error(resultado.detail || 'Error al guardar la reserva');
       }
 
-
       router.push({
-        pathname: "/confirmacion",
+        pathname: '/confirmacion',
         query: {
           peluqueroNombre: peluquero.nombre,
           servicio: formData.servicio,
@@ -165,24 +160,13 @@ export default function Reserva() {
           clienteEmail: formData.email,
           clienteTelefono: formData.telefono,
           clienteRut: formData.rut,
-
-          reservaId: resultado.id_reserva.slice(-6).toUpperCase(), 
+          reservaId: resultado.id_reserva.slice(-6).toUpperCase(),
         },
       });
     } catch (err) {
-      console.error("Error al procesar la reserva:", err);
+      console.error('Error al procesar la reserva:', err);
       setError(`Hubo un problema al agendar tu reserva: ${err.message}`);
     }
-  };
-
-
-
-  const formatDisplayDate = (dateString) => {
-
-  };
-
-  const getServicePrice = (serviceName) => {
-
   };
 
   if (!peluquero && !error) {
@@ -195,171 +179,99 @@ export default function Reserva() {
 
   return (
     <section className="reserva-container">
-      {error && !peluquero && (
-        <div className="error-message">
-          <i className="fas fa-exclamation-circle"></i> {error}
-        </div>
-      )}
+      {error && <div className="error-message">{error}</div>}
 
       {peluquero && (
         <>
           <h2>Reserva con {peluquero.nombre}</h2>
-          <p className="instagram">
-            <i className="fab fa-instagram"></i>
-            <a
-              href={`https://instagram.com/${peluquero.usuario}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              @{peluquero.usuario}
-            </a>
-          </p>
-        
-          {error && (
-            <div className="error-message">
-              <i className="fas fa-exclamation-circle"></i> {error}
-            </div>
-          )}
-
-          <div className="reserva-steps">
-            <div className={`step ${currentStep === 1 ? "active" : ""}`} data-step="1">
-              <span className="step-number">1</span>
-              <span className="step-label">Fecha y Hora</span>
-            </div>
-            <div className={`step ${currentStep === 2 ? "active" : ""}`} data-step="2">
-              <span className="step-number">2</span>
-              <span className="step-label">Datos de Contacto</span>
-            </div>
-          </div>
 
           <form onSubmit={handleSubmit} className="reserva-form">
-            <div className={`form-step ${currentStep === 1 ? "active" : ""}`}>
-              <div className="form-group">
-                <label htmlFor="fecha">Fecha:</label>
-                <input
-                  type="date"
-                  id="fecha"
-                  name="fecha"
-                  required
-                  value={formData.fecha}
-                  onChange={handleDateChange}
-                  min={new Date().toISOString().split("T")[0]}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Horarios Disponibles:</label>
-                <div className="time-sections">
-                  {["Mañana", "Tarde"].map((periodo, i) => {
-                    const horas =
-                      i === 0
-                        ? ["08:00", "09:00", "10:00", "11:00"]
-                        : ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
-                    return (
-                      <div key={periodo} className="time-section">
-                        <h4>{periodo}</h4>
-                        <div className="horarios-grid">
-                          {horas.map((hora) => {
-                            const estado = availableHours[hora] || "no-disponible";
-                            return (
-                              <div key={hora} className={`hora-slot ${estado}`}>
-                                <input
-                                  type="radio"
-                                  name="hora"
-                                  value={hora}
-                                  id={`hora-${hora}`}
-                                  checked={formData.hora === hora}
-                                  onChange={handleHourChange}
-                                  disabled={estado !== "disponible"}
-                                  required
-                                />
-                                <label htmlFor={`hora-${hora}`}>
-                                  {hora} - <span className="estado">{estado}</span>
-                                </label>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
+            {currentStep === 1 && (
+              <div className="step-1">
+                <div className="form-group">
+                  <label>Fecha:</label>
+                  <input
+                    type="date"
+                    value={formData.fecha}
+                    onChange={handleDateChange}
+                    min={new Date().toISOString().split('T')[0]}
+                  />
                 </div>
-              </div>
 
-              <div className="form-group">
-                <label htmlFor="servicio">Servicio:</label>
-                <select
-                  name="servicio"
-                  id="servicio"
-                  value={formData.servicio}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Seleccione un servicio</option>
-                  {peluquero.servicios.map((servicio, index) => (
-                    <option key={index} value={servicio}>
-                      {servicio} - ${peluquero.precios[servicio]}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className="form-group">
+                  <label>Horarios disponibles:</label>
+                  <div className="horas-grid">
+                    {Object.keys(availableHours).map((hora) => (
+                      <label key={hora} className={`slot ${availableHours[hora]}`}>
+                        <input
+                          type="radio"
+                          name="hora"
+                          value={hora}
+                          checked={formData.hora === hora}
+                          onChange={handleHourChange}
+                          disabled={availableHours[hora] !== 'disponible'}
+                        />
+                        {hora}
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-              <div className="form-navigation">
-                <button type="button" className="btn-next" onClick={handleNextStep}>
+                <div className="form-group">
+                  <label>Servicio:</label>
+                  <select
+                    value={formData.servicio}
+                    name="servicio"
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Seleccionar servicio</option>
+                    {peluquero.servicios.map((s) => (
+                      <option key={s} value={s}>
+                        {s} - ${peluquero.precios[s]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <button type="button" onClick={handleNextStep} className="btn-next">
                   Siguiente
                 </button>
               </div>
-            </div>
+            )}
 
-            <div className={`form-step ${currentStep === 2 ? "active" : ""}`}>
-              <h3>
-                <i className="fas fa-user-edit"></i> Tus Datos
-              </h3>
-
-              {["nombre", "apellido", "email", "telefono", "rut"].map((campo) => (
-                <div className="form-group" key={campo}>
-                  <label htmlFor={campo}>
-                    {campo.charAt(0).toUpperCase() + campo.slice(1)}{" "}
-                    {["nombre", "apellido", "email", "telefono"].includes(campo)
-                      ? "*"
-                      : ""}
-                  </label>
-                  <input
-                    type={campo === "email" ? "email" : "text"}
-                    id={campo}
-                    name={campo}
-                    value={formData[campo]}
-                    onChange={handleChange}
-                    required={["nombre", "apellido", "email", "telefono"].includes(
-                      campo
-                    )}
-                  />
+            {currentStep === 2 && (
+              <div className="step-2">
+                <div className="form-group">
+                  <label>Nombre*</label>
+                  <input name="nombre" value={formData.nombre} onChange={handleChange} required />
                 </div>
-              ))}
+                <div className="form-group">
+                  <label>Apellido*</label>
+                  <input name="apellido" value={formData.apellido} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Email*</label>
+                  <input name="email" type="email" value={formData.email} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Teléfono*</label>
+                  <input name="telefono" value={formData.telefono} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>RUT</label>
+                  <input name="rut" value={formData.rut} onChange={handleChange} />
+                </div>
 
-              <div className="form-navigation">
-                <button type="button" className="btn-prev" onClick={handlePrevStep}>
+                <button type="button" onClick={handlePrevStep} className="btn-prev">
                   Anterior
                 </button>
                 <button type="submit" className="btn-confirmar">
-                  <i className="fas fa-check-circle"></i> Agendar
+                  Agendar
                 </button>
               </div>
-            </div>
+            )}
           </form>
-
-          {/* Resumen */}
-          <div className="reserva-summary">
-            <h4>Resumen de tu reserva</h4>
-            <div className="summary-content">
-              <div className="summary-item"><strong>Servicio:</strong> <span>{formData.servicio || "-"}</span></div>
-              <div className="summary-item"><strong>Precio:</strong> <span>{getServicePrice(formData.servicio)}</span></div>
-              <div className="summary-item"><strong>Fecha:</strong> <span>{formatDisplayDate(formData.fecha)}</span></div>
-              <div className="summary-item"><strong>Hora:</strong> <span>{formData.hora || "-"}</span></div>
-              <div className="summary-item"><strong>Barbero:</strong> <span>{peluquero.nombre}</span></div>
-              <div className="summary-item"><strong>Lugar:</strong> <span>VALIANT Barbería</span></div>
-            </div>
-          </div>
         </>
       )}
     </section>

@@ -3,38 +3,35 @@ import DashboardLayoutAdmin from "../../components/DashboardLayoutAdmin";
 import DataTable from "../../components/DataTable";
 
 export default function ClientesAdmin() {
+  const [rows, setRows] = useState([]);
   const backendUrl =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     "https://barberia-proyecto-back-production-f876.up.railway.app";
 
-  const [clientes, setClientes] = useState([]);
-
   useEffect(() => {
-    const cargarClientes = async () => {
+    const cargar = async () => {
       try {
-        const res = await fetch(`${backendUrl}/clientes/`);
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          const limpio = data.map((c) => ({
-            nombre: c.nombre,
-            correo: c.correo || "N/A",
-            telefono: c.telefono || "N/A",
-          }));
-          setClientes(limpio);
-        }
-      } catch (err) {
-        console.error("Error cargando clientes:", err);
+        const r = await fetch(`${backendUrl}/clientes/`);
+        const data = await r.json();
+        const form = (Array.isArray(data) ? data : []).map((c) => ({
+          nombre: c.nombre || "-",
+          apellido: c.apellido || "-",
+          email: c.email || "-",
+          telefono: c.telefono || "-",
+        }));
+        setRows(form);
+      } catch (e) {
+        console.error(e);
+        setRows([]);
       }
     };
-    cargarClientes();
+    cargar();
   }, [backendUrl]);
-
-  const columnas = ["nombre", "correo", "telefono"];
 
   return (
     <DashboardLayoutAdmin usuario="Administrador">
-      <h2>Clientes Registrados</h2>
-      <DataTable data={clientes} columnas={columnas} />
+      <h2>Clientes</h2>
+      <DataTable columnas={["nombre", "apellido", "email", "telefono"]} data={rows} />
     </DashboardLayoutAdmin>
   );
 }
