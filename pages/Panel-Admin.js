@@ -36,17 +36,23 @@ export default function AdminPanel() {
     }
   };
 
-  //  Funciones de Gestión de Barberos 
+  // --- Funciones de Gestión de Barberos ---
   const agregarBarberos = async () => {
     const nombre = prompt("Ingrese el nombre del barbero:");
     const especialidad = prompt("Ingrese la especialidad (ej: Cortes, Barba):");
-    if (!nombre) {
-      alert("El nombre es obligatorio.");
+    const usuario = prompt("Ingrese un nombre de usuario para el barbero:");
+    const contrasena = prompt("Ingrese una contraseña para el barbero:");
+    if (!nombre || !usuario || !contrasena) {
+      alert("El nombre, usuario y contraseña son obligatorios.");
       return;
     }
+    
     const nuevoBarbero = {
       nombre: nombre,
-      especialidad: especialidad || null
+      especialidad: especialidad || null,
+      usuario: usuario,
+      contrasena: contrasena,
+      disponibilidades: [] 
     };
     try {
       const res = await fetch(`${backendUrl}/barberos/`, {
@@ -54,11 +60,10 @@ export default function AdminPanel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevoBarbero),
       });
+      const resultado = await res.json(); 
       if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.detail || 'Error del servidor');
+          throw new Error(resultado.detail || 'Error del servidor');
       }
-      const resultado = await res.json();
       alert(resultado.mensaje || "Barbero agregado");
       mostrarBarberos(); 
     } catch (err) {
@@ -74,11 +79,13 @@ export default function AdminPanel() {
       const res = await fetch(`${backendUrl}/barberos/${id}`, { 
         method: 'DELETE' 
       });
+
+      const resultado = await res.json(); 
+
       if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.detail || 'Error del servidor');
+          throw new Error(resultado.detail || 'Error del servidor');
       }
-      const resultado = await res.json();
+      
       alert(resultado.mensaje || "Barbero eliminado");
       mostrarBarberos();
     } catch (err) {
@@ -87,34 +94,35 @@ export default function AdminPanel() {
     }
   };
 
-  //  Función de Gestión de Disponibilidad 
+  // --- Función de Gestión de Disponibilidad ---
   const agregarDisponibilidad = async () => {
     const fecha = prompt("Ingrese la fecha (YYYY-MM-DD):");
     const hora_inicio = prompt("Ingrese la hora de inicio (HH:MM):");
     const hora_fin = prompt("Ingrese la hora de fin (HH:MM):");
     const estado = "disponible";
+
     if (!fecha || !hora_inicio || !hora_fin) {
       alert("Debe completar todos los campos.");
       return;
     }
+
     const nuevaDisponibilidad = {
       fecha,
       hora_inicio,
       hora_fin,
-      estado,
-      id_barbero: null
+      estado
     };
+
     try {
       const res = await fetch(`${backendUrl}/disponibilidad/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevaDisponibilidad),
       });
+      const resultado = await res.json(); 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.detail || 'Error del servidor');
+        throw new Error(resultado.detail || 'Error del servidor');
       }
-      const resultado = await res.json();
       alert(resultado.mensaje || "Disponibilidad agregada correctamente");
       mostrarDisponibilidad();
     } catch (err) {
@@ -139,10 +147,11 @@ export default function AdminPanel() {
     try {
       const res = await fetch(`${backendUrl}/disponibilidad/bloquear/${id}`, { method: 'PUT' });
       const resultado = await res.json();
+      if (!res.ok) throw new Error(resultado.detail);
       alert(resultado.mensaje);
     } catch (err) {
       console.error(err);
-      alert('Error al bloquear el horario.');
+      alert(`Error al bloquear el horario: ${err.message}`);
     }
   };
   const confirmarReserva = async () => {
@@ -151,10 +160,11 @@ export default function AdminPanel() {
     try {
       const res = await fetch(`${backendUrl}/reservas/confirmar/${id}`, { method: 'PUT' });
       const resultado = await res.json();
+      if (!res.ok) throw new Error(resultado.detail);
       alert(resultado.mensaje);
     } catch (err) {
       console.error(err);
-      alert('Error al confirmar la reserva.');
+      alert(`Error al confirmar la reserva: ${err.message}`);
     }
   };
   const cancelarReserva = async () => {
@@ -163,10 +173,11 @@ export default function AdminPanel() {
     try {
       const res = await fetch(`${backendUrl}/reservas/cancelar/${id}`, { method: 'DELETE' });
       const resultado = await res.json();
+      if (!res.ok) throw new Error(resultado.detail);
       alert(resultado.mensaje);
     } catch (err) {
       console.error(err);
-      alert('Error al cancelar la reserva.');
+      alert(`Error al cancelar la reserva: ${err.message}`);
     }
   };
 
@@ -234,6 +245,7 @@ export default function AdminPanel() {
       </div>
 
       <div className="admin-footer-actions">
+        {/* Sintaxis moderna de Link (sin <a> interna) */}
         <Link href="/" className="btn-back-home">
           Volver al Inicio
         </Link>
@@ -241,3 +253,4 @@ export default function AdminPanel() {
     </section>
   );
 }
+
