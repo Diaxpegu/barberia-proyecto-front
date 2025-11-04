@@ -36,7 +36,7 @@ export default function AdminPanel() {
     }
   };
 
-  // --- Funciones de Gestión de Barberos ---
+  //  Funciones de Gestión de Barberos 
   const agregarBarberos = async () => {
     const nombre = prompt("Ingrese el nombre del barbero:");
     const especialidad = prompt("Ingrese la especialidad (ej: Cortes, Barba):");
