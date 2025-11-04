@@ -17,24 +17,19 @@ export default function PanelBarbero() {
   const backendUrl =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'https://barberia-proyecto-back-production-f876.up.railway.app';
-    
+
   useEffect(() => {
     const usuarioBarbero = localStorage.getItem('barberUser');
     const barberoId = localStorage.getItem('barberId');
-
     if (!usuarioBarbero || !barberoId) {
       router.push('/login');
       return;
     }
-
     const BuscarBarberoData = async () => {
       try {
         setLoading(true);
         const res = await fetch(`${backendUrl}/barberos/${barberoId}`);
-        
-        if (!res.ok) {
-          throw new Error('No se pudieron cargar los datos del barbero.');
-        }
+        if (!res.ok) throw new Error('No se pudieron cargar los datos del barbero.');
         const data = await res.json();
         setBarbero(data);
       } catch (err) {
@@ -53,26 +48,21 @@ export default function PanelBarbero() {
 
   useEffect(() => {
     if (!barbero) return;
-
     const BuscarPaneles = async () => {
       try {
         setError('');
         const barberoId = barbero._id;
-        
         const [resAgenda, resHistorial, resDispo] = await Promise.all([
           fetch(`${backendUrl}/barbero/agenda/${barberoId}`),
           fetch(`${backendUrl}/barbero/historial/${barberoId}`),
           fetch(`${backendUrl}/barberos/${barberoId}/disponibilidades`) 
         ]);
-        
         if (!resAgenda.ok || !resHistorial.ok || !resDispo.ok) {
             throw new Error("No se pudo cargar la información del panel.");
         }
-        
         const dataAgenda = await resAgenda.json();
         const dataHistorial = await resHistorial.json();
         const dataDispo = await resDispo.json();
-        
         setAgenda(dataAgenda);
         setHistorial(dataHistorial);
         setDisponibilidad(dataDispo);
@@ -83,55 +73,36 @@ export default function PanelBarbero() {
     BuscarPaneles();
   }, [barbero, backendUrl]);
 
-  //  Funciones de Acción 
+  
 
   const agregarDisponibilidad = async () => {
-    if (!barbero) return;
-    const fecha = prompt("Ingrese la fecha (YYYY-MM-DD):");
-    const hora_inicio = prompt("Ingrese la hora de inicio (HH:MM):");
-    const hora_fin = prompt("Ingrese la hora de fin (HH:MM):");
-    if (!fecha || !hora_inicio || !hora_fin) {
-      alert("Todos los campos son requeridos.");
-      return;
-    }
-    try {
-      const res = await fetch(`${backendUrl}/disponibilidad/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fecha,
-          hora_inicio,
-          hora_fin,
-          estado: 'disponible',
-          id_barbero: barbero._id 
-        }),
-      });
-      const resultado = await res.json();
-      if (!res.ok) throw new Error(resultado.detail || "Error al guardar");
-      alert("Horario agregado con éxito.");
-      
-      const resDispo = await fetch(`${backendUrl}/barberos/${barbero._id}/disponibilidades`);
-      const dataDispo = await resDispo.json();
-      setDisponibilidad(dataDispo);
-    } catch (err) {
-      alert(`Error: ${err.message}`);
-    }
   };
 
-  const BloquearDisponibilidad = async (dispoId) => {
-    if (!barbero || !dispoId) return;
+  const BloquearDisponibilidad = async (fecha, hora) => {
+    if (!barbero || !fecha || !hora) {
+      alert("Error: Faltan datos para bloquear.");
+      return;
+    }
+    
+    if (!confirm(`¿Seguro que deseas bloquear el horario ${fecha} a las ${hora}? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
     try {
-      const res = await fetch(`${backendUrl}/disponibilidad/bloquear/${dispoId}`, {
+      const res = await fetch(`${backendUrl}/disponibilidad/bloquear/${barbero._id}/${fecha}/${hora}`, {
         method: 'PUT',
       });
+      
       const resultado = await res.json();
       if (!res.ok) throw new Error(resultado.detail || "Error al bloquear");
+      
       alert(resultado.mensaje);
       setDisponibilidad(prev => 
         prev.map(d => 
-          d._id === dispoId ? { ...d, estado: 'bloqueado' } : d
+          (d.fecha === fecha && d.hora === hora) ? { ...d, estado: 'ocupado' } : d
         )
       );
+
     } catch (err) {
       alert(`Error: ${err.message}`);
     }
@@ -144,6 +115,7 @@ export default function PanelBarbero() {
     localStorage.removeItem('rol');
     router.push('/login');
   };
+
   if (loading) {
     return <p className="loading-container">Cargando panel...</p>;
   }
@@ -154,7 +126,6 @@ export default function PanelBarbero() {
     return null; 
   }
 
-  // Función para el panel activo
   const renderVista = () => {
     switch (vistaActual) {
       case 'agenda':
@@ -166,7 +137,7 @@ export default function PanelBarbero() {
           <RenderTabla
             items={disponibilidad}
             tipo="disponibilidad"
-            onBlock={BloquearDisponibilidad}
+            onBlock={BloquearDisponibilidad} 
             onAdd={agregarDisponibilidad}
           />
         );
@@ -278,7 +249,7 @@ function RenderTabla({ items, tipo, onBlock, onAdd }) {
                     {item.estado === 'disponible' && (
                       <button 
                         className="btn-accion-bloquear" 
-                        onClick={() => alert('Función Bloquear no implementada correctamente.')}
+                        onClick={() => onBlock(item.fecha, item.hora)}
                       >
                         Bloquear
                       </button>
