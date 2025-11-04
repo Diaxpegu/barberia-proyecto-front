@@ -8,13 +8,19 @@ export default function Home() {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'https://barberia-proyecto-back-production-f876.up.railway.app';
 
+  // Función para crear slugs amigables
+  const crearSlug = (nombre) =>
+    nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") // quita acentos
+          .replace(/\s+/g, '-')                                           // espacios → guiones
+          .replace(/[^a-z0-9-]/g, '');                                    // limpia caracteres raros
+
   // Cargar barberos desde la base de datos
   useEffect(() => {
     const fetchBarberos = async () => {
       try {
         const res = await fetch(`${backendUrl}/barberos/`);
         const data = await res.json();
-        setPeluqueros(data);
+        setPeluqueros(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Error al cargar barberos:', err);
       }
@@ -71,33 +77,40 @@ export default function Home() {
         <h3>Elige tu peluquero y reserva tu cita</h3>
 
         <div className="peluqueros-grid">
-          {peluqueros.map((peluquero) => (
-            <div className="peluquero-card" key={peluquero._id}>
-              <h3>{peluquero.nombre}</h3>
-              <p className="instagram-link">
-                <i className="fab fa-instagram"></i>{' '}
+          {peluqueros.length === 0 ? (
+            <p>Cargando barberos...</p>
+          ) : (
+            peluqueros.map((peluquero) => (
+              <div className="peluquero-card" key={peluquero._id}>
+                <h3>{peluquero.nombre}</h3>
+                <p className="instagram-link">
+                  <i className="fab fa-instagram"></i>{' '}
+                  <a
+                    href={`https://instagram.com/${peluquero.usuario || peluquero.instagram || ""}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    @{peluquero.usuario || peluquero.instagram || "sin_usuario"}
+                  </a>
+                </p>
+
+                <div className="servicios">
+                  <h4>Especialidad:</h4>
+                  <ul>
+                    <li>{peluquero.especialidad || 'No especificada'}</li>
+                  </ul>
+                </div>
+
+                {/* Botón Reservar redirige con slug */}
                 <a
-                  href={`https://instagram.com/${peluquero.usuario || peluquero.instagram}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={`/reserva/${crearSlug(peluquero.nombre)}`}
+                  className="btn-reservar"
                 >
-                  @{peluquero.usuario || peluquero.instagram}
+                  <i className="fas fa-calendar-check"></i> Reservar
                 </a>
-              </p>
-
-              <div className="servicios">
-                <h4>Especialidad:</h4>
-                <ul>
-                  <li>{peluquero.especialidad || 'No especificada'}</li>
-                </ul>
               </div>
-
-              {/* Botón Reservar abre en misma pestaña */}
-              <a href={`/reserva/${peluquero._id}`} className="btn-reservar">
-                <i className="fas fa-calendar-check"></i> Reservar
-              </a>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Quienes somos */}
