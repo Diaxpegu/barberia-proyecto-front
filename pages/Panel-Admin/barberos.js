@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import DashboardLayoutAdmin from "@/components/DashboardLayoutAdmin";
-import DataTable from "@/components/DataTable";
+import DashboardLayoutAdmin from "../../components/DashboardLayoutAdmin";
+import DataTable from "../../components/DataTable";
 
 export default function BarberosAdmin() {
   const [data, setData] = useState([]);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import DashboardLayoutBarbero from "@/components/DashboardLayoutBarbero";
+import DashboardLayoutBarbero from "../../components/DashboardLayoutBarbero";
+
 
 export default function PerfilBarbero() {
   const backendUrl =

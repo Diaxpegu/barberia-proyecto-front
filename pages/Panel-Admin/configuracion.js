@@ -1,4 +1,4 @@
-import DashboardLayoutAdmin from "@/components/DashboardLayoutAdmin";
+import DashboardLayoutAdmin from "../../components/DashboardLayoutAdmin";
 
 export default function ConfiguracionAdmin() {
   return (
