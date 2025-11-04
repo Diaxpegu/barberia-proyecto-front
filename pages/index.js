@@ -1,34 +1,26 @@
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 export default function Home() {
-  const peluqueros = [
-    {
-      id: 1,
-      nombre: 'Lucas Aldair',
-      instagram: 'lukas__aldair',
-      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
-      precios: {
-        'Corte básico': 15000,
-        'Corte premium': 20000,
-        Tintura: 25000,
-        Lavado: 5000,
-        Peinado: 10000,
-      },
-    },
-    {
-      id: 2,
-      nombre: 'Alejandro',
-      instagram: 'ale_.cut',
-      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
-      precios: {
-        'Corte básico': 15000,
-        'Corte premium': 20000,
-        Tintura: 25000,
-        Lavado: 5000,
-        Peinado: 10000,
-      },
-    },
-  ];
+  const [peluqueros, setPeluqueros] = useState([]);
+
+  const backendUrl =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    'https://barberia-proyecto-back-production-f876.up.railway.app';
+
+  // Cargar barberos desde la base de datos
+  useEffect(() => {
+    const fetchBarberos = async () => {
+      try {
+        const res = await fetch(`${backendUrl}/barberos/`);
+        const data = await res.json();
+        setPeluqueros(data);
+      } catch (err) {
+        console.error('Error al cargar barberos:', err);
+      }
+    };
+    fetchBarberos();
+  }, []);
 
   const about_info = {
     descripcion:
@@ -80,37 +72,29 @@ export default function Home() {
 
         <div className="peluqueros-grid">
           {peluqueros.map((peluquero) => (
-            <div className="peluquero-card" key={peluquero.id}>
+            <div className="peluquero-card" key={peluquero._id}>
               <h3>{peluquero.nombre}</h3>
               <p className="instagram-link">
                 <i className="fab fa-instagram"></i>{' '}
                 <a
-                  href={`https://instagram.com/${peluquero.instagram.replace(
-                    '@',
-                    ''
-                  )}`}
+                  href={`https://instagram.com/${peluquero.usuario || peluquero.instagram}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {peluquero.instagram}
+                  @{peluquero.usuario || peluquero.instagram}
                 </a>
               </p>
+
               <div className="servicios">
-                <h4>Servicios:</h4>
+                <h4>Especialidad:</h4>
                 <ul>
-                  {peluquero.servicios.map((servicio, index) => (
-                    <li key={index}>
-                      {servicio} - ${peluquero.precios[servicio]}
-                    </li>
-                  ))}
+                  <li>{peluquero.especialidad || 'No especificada'}</li>
                 </ul>
               </div>
+
               {/* Botón Reservar abre en misma pestaña */}
-              <a href={`/reserva/${peluquero.id}`} className="btn-reservar">
+              <a href={`/reserva/${peluquero._id}`} className="btn-reservar">
                 <i className="fas fa-calendar-check"></i> Reservar
-              </a>
-              <a href={`/panel/${peluquero.id}`} className="btn-panel">
-                <i className="fas fa-user-cog"></i> Panel
               </a>
             </div>
           ))}
@@ -242,7 +226,7 @@ export default function Home() {
               ></iframe>
 
               <a
-                href="https://www.google.com/maps/place/Victoria+2486,+2340000+Valpara%C3%ADso/@-33.04874,-71.6127049,17z/data=!3m1!4b1!4m6!3m5!1s0x9689e0db65601d6d:0x2598bceaabfeccfe!8m2!3d-33.04874!4d-71.61013!16s%2Fg%2F11x80xg18t?entry=ttu&g_ep=EgoyMDI1MDkwOS4wIKXMDSoASAFQAw%3D%3D"
+                href="https://www.google.com/maps/place/Victoria+2486,+2340000+Valpara%C3%ADso/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="map-link"
