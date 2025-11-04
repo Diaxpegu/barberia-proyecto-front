@@ -1,77 +1,129 @@
-import { useEffect, useState } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
-export default function PanelAdmin() {
-  const backendUrl =
-    process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "https://barberia-proyecto-back-production-f876.up.railway.app";
+export default function DashboardLayoutBarbero({ children, usuario }) {
+  const router = useRouter();
 
-  const [resumen, setResumen] = useState({ clientes: 0, barberos: 0, reservas: 0 });
-
-  useEffect(() => {
-    const cargarResumen = async () => {
-      try {
-        const [clientes, barberos, reservas] = await Promise.all([
-          fetch(`${backendUrl}/clientes/`).then((r) => r.json()),
-          fetch(`${backendUrl}/barberos/`).then((r) => r.json()),
-          fetch(`${backendUrl}/reservas/pendientes/`).then((r) => r.json()),
-        ]);
-        setResumen({
-          clientes: clientes.length,
-          barberos: barberos.length,
-          reservas: reservas.length,
-        });
-      } catch (err) {
-        console.error("Error al cargar resumen:", err);
-      }
-    };
-    cargarResumen();
-  }, [backendUrl]);
+  const handleLogout = () => {
+    localStorage.removeItem("barberUser");
+    localStorage.removeItem("barberId");
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("rol");
+    router.push("/login");
+  };
 
   return (
-    <DashboardLayout usuario="Administrador">
-      <h2>Estado General del Negocio</h2>
+    <div className="dashboard-layout">
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <h2>Panel del Barbero</h2>
+          <p className="usuario">👤 {usuario || "Barbero"}</p>
+        </div>
 
-      <div className="resumen-grid">
-        <div className="card clientes">
-          <h4>Clientes</h4>
-          <span>{resumen.clientes}</span>
+        <nav className="sidebar-nav">
+          <ul>
+            <li>
+              <Link href="/Panel-Barbero">Agenda</Link>
+            </li>
+            <li>
+              <Link href="/Panel-Barbero/historial">Historial</Link>
+            </li>
+            <li>
+              <Link href="/Panel-Barbero/perfil">Perfil</Link>
+            </li>
+          </ul>
+        </nav>
+
+        <div className="logout-container">
+          <button onClick={handleLogout} className="btn-logout">
+            <i className="fas fa-sign-out-alt"></i> Cerrar Sesión
+          </button>
         </div>
-        <div className="card barberos">
-          <h4>Barberos</h4>
-          <span>{resumen.barberos}</span>
-        </div>
-        <div className="card reservas">
-          <h4>Reservas Pendientes</h4>
-          <span>{resumen.reservas}</span>
-        </div>
-      </div>
+      </aside>
+
+      {/* Contenido principal */}
+      <main className="main-content">{children}</main>
 
       <style jsx>{`
-        .resumen-grid {
+        .dashboard-layout {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 1.5rem;
-          margin: 2rem 0;
+          grid-template-columns: 260px 1fr;
+          min-height: 100vh;
+          background: #f4f6f8;
         }
-        .card {
-          padding: 1.5rem;
-          border-radius: 12px;
-          text-align: center;
+
+        .sidebar {
+          background: #1e1e2f;
           color: white;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 2rem 1.5rem;
+        }
+
+        .sidebar-header h2 {
+          margin: 0 0 0.5rem;
+          font-size: 1.5rem;
           font-weight: bold;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          color: #ffffff;
         }
-        .clientes {
-          background: linear-gradient(135deg, #007bff, #5bc0de);
+
+        .usuario {
+          font-size: 0.95rem;
+          color: #cfcfcf;
+          margin-bottom: 1rem;
         }
-        .barberos {
-          background: linear-gradient(135deg, #28a745, #8cd17d);
+
+        .sidebar-nav ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
         }
-        .reservas {
-          background: linear-gradient(135deg, #ffc107, #ff9800);
+
+        .sidebar-nav li {
+          margin: 1rem 0;
+        }
+
+        .sidebar-nav a {
+          color: #cfcfcf;
+          text-decoration: none;
+          font-weight: 500;
+          display: block;
+          transition: color 0.3s ease;
+        }
+
+        .sidebar-nav a:hover {
+          color: #ffffff;
+        }
+
+        .logout-container {
+          margin-top: auto;
+        }
+
+        .btn-logout {
+          background: #e74c3c;
+          color: white;
+          border: none;
+          padding: 10px 15px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          transition: background 0.3s ease;
+          width: 100%;
+          text-align: center;
+        }
+
+        .btn-logout:hover {
+          background: #c0392b;
+        }
+
+        .main-content {
+          padding: 2rem;
+          background: #f4f6f8;
+          overflow-y: auto;
         }
       `}</style>
-    </DashboardLayout>
+    </div>
   );
 }
