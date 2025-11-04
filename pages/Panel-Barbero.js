@@ -17,6 +17,7 @@ export default function PanelBarbero() {
   const backendUrl =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'https://barberia-proyecto-back-production-f876.up.railway.app';
+    
   useEffect(() => {
     const usuarioBarbero = localStorage.getItem('barberUser');
     const barberoId = localStorage.getItem('barberId');
@@ -55,18 +56,23 @@ export default function PanelBarbero() {
 
     const BuscarPaneles = async () => {
       try {
+        setError('');
         const barberoId = barbero._id;
+        
         const [resAgenda, resHistorial, resDispo] = await Promise.all([
           fetch(`${backendUrl}/barbero/agenda/${barberoId}`),
           fetch(`${backendUrl}/barbero/historial/${barberoId}`),
-          fetch(`${backendUrl}/barbero/disponibilidad/${barberoId}`)
+          fetch(`${backendUrl}/barberos/${barberoId}/disponibilidades`) 
         ]);
+        
         if (!resAgenda.ok || !resHistorial.ok || !resDispo.ok) {
             throw new Error("No se pudo cargar la información del panel.");
         }
+        
         const dataAgenda = await resAgenda.json();
         const dataHistorial = await resHistorial.json();
         const dataDispo = await resDispo.json();
+        
         setAgenda(dataAgenda);
         setHistorial(dataHistorial);
         setDisponibilidad(dataDispo);
@@ -103,7 +109,8 @@ export default function PanelBarbero() {
       const resultado = await res.json();
       if (!res.ok) throw new Error(resultado.detail || "Error al guardar");
       alert("Horario agregado con éxito.");
-      const resDispo = await fetch(`${backendUrl}/barbero/disponibilidad/${barbero._id}`);
+      
+      const resDispo = await fetch(`${backendUrl}/barberos/${barbero._id}/disponibilidades`);
       const dataDispo = await resDispo.json();
       setDisponibilidad(dataDispo);
     } catch (err) {
@@ -129,6 +136,7 @@ export default function PanelBarbero() {
       alert(`Error: ${err.message}`);
     }
   };
+
   const handleLogout = () => {
     localStorage.removeItem('barberUser');
     localStorage.removeItem('barberId');
@@ -140,7 +148,7 @@ export default function PanelBarbero() {
     return <p className="loading-container">Cargando panel...</p>;
   }
   if (error) {
-    return <p className="error-message">Error: {error}</p>;
+    return <p className="error-message" style={{ padding: '2rem', textAlign: 'center' }}>Error: {error}</p>;
   }
   if (!barbero) {
     return null; 
@@ -222,9 +230,9 @@ function RenderTabla({ items, tipo, onBlock, onAdd }) {
 
   let columnas = [];
   if (tipo === 'agenda' || tipo === 'historial') {
-    columnas = ['Fecha', 'Hora', 'Cliente', 'Servicio', 'Estado'];
+    columnas = ['Fecha', 'Hora', 'ID Cliente', 'ID Servicio', 'Estado']; 
   } else if (tipo === 'disponibilidad') {
-    columnas = ['Fecha', 'Hora Inicio', 'Hora Fin', 'Estado', 'Acciones'];
+    columnas = ['Fecha', 'Hora', 'Estado', 'Acciones']; 
   }
 
   return (
@@ -241,14 +249,14 @@ function RenderTabla({ items, tipo, onBlock, onAdd }) {
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
-            <tr key={item._id}>
+          {items.map((item, index) => ( 
+            <tr key={item._id || index}>
               {tipo === 'agenda' && (
                 <>
                   <td>{item.fecha}</td>
                   <td>{item.hora}</td>
-                  <td>{item.cliente && item.cliente[0] ? item.cliente[0].nombre : 'N/A'}</td>
-                  <td>{item.servicio && item.servicio[0] ? item.servicio[0].nombre_servicio : 'N/A'}</td>
+                  <td>{item.id_cliente || 'N/A'}</td>
+                  <td>{item.id_servicio || 'N/A'}</td>
                   <td><span className="estado-pendiente">{item.estado}</span></td>
                 </>
               )}
@@ -256,22 +264,21 @@ function RenderTabla({ items, tipo, onBlock, onAdd }) {
                 <>
                   <td>{item.fecha}</td>
                   <td>{item.hora}</td>
-                  <td>{item.cliente && item.cliente[0] ? item.cliente[0].nombre : 'N/A'}</td>
-                  <td>{item.servicio && item.servicio[0] ? item.servicio[0].nombre_servicio : 'N/A'}</td>
+                  <td>{item.id_cliente || 'N/A'}</td>
+                  <td>{item.id_servicio || 'N/A'}</td>
                   <td><span className="estado-confirmado">{item.estado}</span></td>
                 </>
               )}
               {tipo === 'disponibilidad' && (
                 <>
                   <td>{item.fecha}</td>
-                  <td>{item.hora_inicio}</td>
-                  <td>{item.hora_fin}</td>
+                  <td>{item.hora}</td>
                   <td>{item.estado}</td>
                   <td>
                     {item.estado === 'disponible' && (
                       <button 
                         className="btn-accion-bloquear" 
-                        onClick={() => onBlock(item._id)}
+                        onClick={() => alert('Función Bloquear no implementada correctamente.')}
                       >
                         Bloquear
                       </button>
