@@ -16,6 +16,7 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setMensaje('');
+    setColorMensaje('');
 
     try {
       const res = await fetch(`${backendUrl}/login/`, {
@@ -29,15 +30,19 @@ export default function Login() {
       if (!res.ok) {
         setColorMensaje('red');
         setMensaje(data.detail || 'Usuario o contraseña incorrectos');
+        localStorage.clear();
         return;
       }
+      localStorage.clear(); 
       localStorage.setItem('usuario', data.usuario);
       localStorage.setItem('rol', data.rol);
       if (data.rol === 'barbero') {
-        localStorage.setItem('barberUser', data.usuario);
+        localStorage.setItem('barberUser', data.usuario); 
+        localStorage.setItem('barberId', data._id); 
       }
       setColorMensaje('green');
       setMensaje('Inicio de sesión exitoso');
+
       setTimeout(() => {
         if (data.rol === 'jefe') {
           router.push('/Panel-Admin');

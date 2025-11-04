@@ -17,11 +17,11 @@ export default function PanelBarbero() {
   const backendUrl =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'https://barberia-proyecto-back-production-f876.up.railway.app';
-
-  // Verificar autenticacion
   useEffect(() => {
     const usuarioBarbero = localStorage.getItem('barberUser');
-    if (!usuarioBarbero) {
+    const barberoId = localStorage.getItem('barberId');
+
+    if (!usuarioBarbero || !barberoId) {
       router.push('/login');
       return;
     }
@@ -29,7 +29,8 @@ export default function PanelBarbero() {
     const BuscarBarberoData = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${backendUrl}/barbero/datos/${usuarioBarbero}`);
+        const res = await fetch(`${backendUrl}/barberos/${barberoId}`);
+        
         if (!res.ok) {
           throw new Error('No se pudieron cargar los datos del barbero.');
         }
@@ -38,13 +39,16 @@ export default function PanelBarbero() {
       } catch (err) {
         setError(err.message);
         localStorage.removeItem('barberUser');
+        localStorage.removeItem('barberId');
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('rol');
         router.push('/login');
       } finally {
         setLoading(false);
       }
     };
     BuscarBarberoData();
-  }, [router]);
+  }, [router, backendUrl]);
 
   useEffect(() => {
     if (!barbero) return;
@@ -125,10 +129,11 @@ export default function PanelBarbero() {
       alert(`Error: ${err.message}`);
     }
   };
-
   const handleLogout = () => {
     localStorage.removeItem('barberUser');
-    localStorage.removeItem('isBarberLoggedIn');
+    localStorage.removeItem('barberId');
+    localStorage.removeItem('usuario');
+    localStorage.removeItem('rol');
     router.push('/login');
   };
   if (loading) {
