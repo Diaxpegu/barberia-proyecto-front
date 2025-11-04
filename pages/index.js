@@ -1,34 +1,43 @@
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const peluqueros = [
-    {
-      id: 1,
-      nombre: 'Lucas Aldair',
-      instagram: 'lukas__aldair',
-      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
-      precios: {
-        'Corte básico': 15000,
-        'Corte premium': 20000,
-        Tintura: 25000,
-        Lavado: 5000,
-        Peinado: 10000,
-      },
-    },
-    {
-      id: 2,
-      nombre: 'Alejandro',
-      instagram: 'ale_.cut',
-      servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
-      precios: {
-        'Corte básico': 15000,
-        'Corte premium': 20000,
-        Tintura: 25000,
-        Lavado: 5000,
-        Peinado: 10000,
-      },
-    },
-  ];
+  const [barberos, setBarberos] = useState([]);
+  const [servicios, setServicios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const backendUrl =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    'https://barberia-proyecto-back-production-f876.up.railway.app';
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [barberosRes, serviciosRes] = await Promise.all([
+          fetch(`${backendUrl}/barberos/`),
+          fetch(`${backendUrl}/servicios/`)
+        ]);
+
+        if (!barberosRes.ok || !serviciosRes.ok) {
+          throw new Error('Error al cargar los datos');
+        }
+
+        const barberosData = await barberosRes.json();
+        const serviciosData = await serviciosRes.json();
+
+        setBarberos(barberosData);
+        setServicios(serviciosData);
+      } catch (err) {
+        console.error(err);
+        setError('Error al conectar con el servidor');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [backendUrl]);
 
   const about_info = {
     descripcion:
@@ -48,9 +57,16 @@ export default function Home() {
     },
   };
 
+  if (loading) {
+    return <p className="loading">Cargando información...</p>;
+  }
+
+  if (error) {
+    return <p className="error">{error}</p>;
+  }
+
   return (
     <>
-      {/* Hero Section */}
       <section className="logo-container">
         <Image
           src="/valiant.jpg"
@@ -73,50 +89,48 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Peluqueros */}
       <section className="peluqueros-container">
         <h2 className="section-title">Nuestros Profesionales</h2>
-        <h3>Elige tu peluquero y reserva tu cita</h3>
+        <h3>Elige tu barbero y reserva tu cita</h3>
 
         <div className="peluqueros-grid">
-          {peluqueros.map((peluquero) => (
-            <div className="peluquero-card" key={peluquero.id}>
-              <h3>{peluquero.nombre}</h3>
-              <p className="instagram-link">
-                <i className="fab fa-instagram"></i>{' '}
-                <a
-                  href={`https://instagram.com/${peluquero.instagram.replace(
-                    '@',
-                    ''
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {peluquero.instagram}
+          {barberos.length === 0 ? (
+            <p>No hay barberos registrados actualmente.</p>
+          ) : (
+            barberos.map((b) => (
+              <div className="peluquero-card" key={b._id}>
+                <h3>{b.nombre}</h3>
+
+                {b.especialidades && (
+                  <p className="especialidades">
+                    <strong>Especialidades:</strong>{' '}
+                    {b.especialidades.join(', ')}
+                  </p>
+                )}
+
+                <div className="servicios">
+                  <h4>Servicios:</h4>
+                  <ul>
+                    {servicios.map((s, index) => (
+                      <li key={index}>
+                        {s.nombre} - ${s.precio}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <a href={`/reserva/${b._id}`} className="btn-reservar">
+                  <i className="fas fa-calendar-check"></i> Reservar
                 </a>
-              </p>
-              <div className="servicios">
-                <h4>Servicios:</h4>
-                <ul>
-                  {peluquero.servicios.map((servicio, index) => (
-                    <li key={index}>
-                      {servicio} - ${peluquero.precios[servicio]}
-                    </li>
-                  ))}
-                </ul>
+
+                <a href={`/panel/${b._id}`} className="btn-panel">
+                  <i className="fas fa-user-cog"></i> Panel
+                </a>
               </div>
-              {/* Botón Reservar abre en misma pestaña */}
-              <a href={`/reserva/${peluquero.id}`} className="btn-reservar">
-                <i className="fas fa-calendar-check"></i> Reservar
-              </a>
-              <a href={`/panel/${peluquero.id}`} className="btn-panel">
-                <i className="fas fa-user-cog"></i> Panel
-              </a>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
-        {/* Quienes somos */}
         <section className="about-section">
           <h2>¿Quiénes Somos?</h2>
           <div className="about-content">
@@ -135,7 +149,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Productos */}
         <div className="productos-section">
           <h2>Nuestros Productos</h2>
           <h3>Productos premium para el cuidado de tu cabello y barba</h3>
@@ -167,7 +180,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Contacto */}
         <section className="contact-section">
           <h2>Contáctanos</h2>
           <div className="contact-content">
@@ -242,7 +254,7 @@ export default function Home() {
               ></iframe>
 
               <a
-                href="https://www.google.com/maps/place/Victoria+2486,+2340000+Valpara%C3%ADso/@-33.04874,-71.6127049,17z/data=!3m1!4b1!4m6!3m5!1s0x9689e0db65601d6d:0x2598bceaabfeccfe!8m2!3d-33.04874!4d-71.61013!16s%2Fg%2F11x80xg18t?entry=ttu&g_ep=EgoyMDI1MDkwOS4wIKXMDSoASAFQAw%3D%3D"
+                href="https://www.google.com/maps/place/Victoria+2486,+2340000+Valpara%C3%ADso/@-33.04874,-71.6127049,17z"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="map-link"
