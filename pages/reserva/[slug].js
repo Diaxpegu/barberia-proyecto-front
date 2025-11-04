@@ -32,8 +32,15 @@ export default function Reserva() {
       try {
         const resBarberos = await fetch(`${backendUrl}/barberos/`);
         const todos = await resBarberos.json();
+        
+        // Función para crear slugs (igual a la de la pág principal)
+        const crearSlug = (nombre) =>
+          nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9-]/g, '');
+
         const barberoEncontrado = todos.find(
-          (b) => b.nombre.toLowerCase().replace(/\s+/g, '-') === slug.toLowerCase()
+          (b) => crearSlug(b.nombre) === slug.toLowerCase()
         );
 
         if (!barberoEncontrado) {
@@ -179,10 +186,9 @@ export default function Reserva() {
 
   return (
     <>
-      <style>{slotStyles}</style>
       <section className="reserva-container">
         
-        {/* FORMULARIO  */}
+        {/* FORMULARIO */}
         <div className="reserva-form-wrapper">
           {error && <div className="error-message">{error}</div>}
 

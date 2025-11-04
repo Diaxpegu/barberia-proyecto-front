@@ -2025,12 +2025,41 @@ footer {
 .dash-wrap.admin {
   grid-template-columns: 280px 1fr;
 }
-const slotStyles{
-    .hora-slot { display: block; }
-    .hora-slot.disponible label { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; cursor: pointer; }
-    .hora-slot.disponible:hover label { background-color: #c3e6cb; }
-    .hora-slot input[type="radio"]:checked + label { background-color: var(--color-secondary, #d4af37); border-color: var(--color-secondary); color: var(--color-primary, #1a1a1a); font-weight: bold; }
-    .hora-slot.ocupado label, .hora-slot.pendiente label { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; cursor: not-allowed; text-decoration: line-through; }
-    .hora-slot label { display: block; padding: 10px; border-radius: 4px; text-align: center; transition: all 0.3s ease; }
-    .hora-slot input[type="radio"] { display: none; }
+
+/* Estilos para Slots de Horarios     */
+.hora-slot { 
+  display: block; 
+}
+.hora-slot.disponible label { 
+  background-color: #d4edda; 
+  border: 1px solid #c3e6cb; 
+  color: #155724; 
+  cursor: pointer; 
+}
+.hora-slot.disponible:hover label { 
+  background-color: #c3e6cb; 
+}
+.hora-slot input[type="radio"]:checked + label { 
+  background-color: var(--color-secondary, #d4af37); 
+  border-color: var(--color-secondary); 
+  color: var(--color-primary, #1a1a1a); 
+  font-weight: bold; 
+}
+.hora-slot.ocupado label, 
+.hora-slot.pendiente label { 
+  background-color: #f8d7da; 
+  border: 1px solid #f5c6cb; 
+  color: #721c24; 
+  cursor: not-allowed; 
+  text-decoration: line-through; 
+}
+.hora-slot label { 
+  display: block; 
+  padding: 10px; 
+  border-radius: 4px; 
+  text-align: center; 
+  transition: all 0.3s ease; 
+}
+.hora-slot input[type="radio"] { 
+  display: none; 
 }
