@@ -70,11 +70,10 @@ export default function PanelBarbero() {
         setError(err.message);
       }
     };
-
     BuscarPaneles();
   }, [barbero, backendUrl]);
 
-  // --- Funciones de Acción ---
+  //  Funciones de Acción 
 
   const agregarDisponibilidad = async () => {
     if (!barbero) return;
@@ -132,17 +131,12 @@ export default function PanelBarbero() {
     localStorage.removeItem('isBarberLoggedIn');
     router.push('/login');
   };
-
-  // --- Renderizado ---
-
   if (loading) {
     return <p className="loading-container">Cargando panel...</p>;
   }
-
   if (error) {
     return <p className="error-message">Error: {error}</p>;
   }
-
   if (!barbero) {
     return null; 
   }
