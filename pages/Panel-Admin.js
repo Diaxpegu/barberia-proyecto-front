@@ -6,6 +6,7 @@ export default function AdminPanel() {
   const [data, setData] = useState([]);
   const [columnas, setColumnas] = useState([]);
   const backendUrl = 'https://barberia-proyecto-back-production-f876.up.railway.app';
+
   const BuscarData = async (endpoint, panelName) => {
     try {
       const url = `${backendUrl}${endpoint}`;
@@ -86,8 +87,7 @@ export default function AdminPanel() {
     }
   };
 
-  // --- Función de Gestión de Disponibilidad ---
-
+  // Función de Gestión de Disponibilidad 
   const agregarDisponibilidad = async () => {
     const fecha = prompt("Ingrese la fecha (YYYY-MM-DD):");
     const hora_inicio = prompt("Ingrese la hora de inicio (HH:MM):");
@@ -188,8 +188,7 @@ export default function AdminPanel() {
 
         {data.length === 0 ? (
           <p>No hay datos disponibles</p>
-        ):
-        (
+        ) : (
           <table>
             <thead>
               <tr>
@@ -235,8 +234,8 @@ export default function AdminPanel() {
       </div>
 
       <div className="admin-footer-actions">
-        <Link href="/" legacyBehavior>
-          <a className="btn-back-home">Volver al Inicio</a>
+        <Link href="/" className="btn-back-home">
+          Volver al Inicio
         </Link>
       </div>
     </section>
