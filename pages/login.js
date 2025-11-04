@@ -5,8 +5,7 @@ import Link from 'next/link';
 export default function Login() {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [mensaje, setMensaje] = useState('');
-  const [colorMensaje, setColorMensaje] = useState('');
+  const [error, setError] = useState('');
   const router = useRouter();
 
   const backendUrl =
@@ -15,63 +14,47 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setMensaje('');
+    setError('');
 
     try {
       const res = await fetch(`${backendUrl}/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuario, contrasena }),
+        body: JSON.stringify({
+          usuario: usuario,
+          contrasena: contrasena,
+        }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setColorMensaje('red');
-        setMensaje(data.detail || 'Usuario o contraseña incorrectos');
+        setError(data.detail || 'Usuario o contraseña incorrectos');
         return;
       }
-
-      localStorage.setItem('usuario', data.usuario);
-      localStorage.setItem('rol', data.rol);
-
-      setColorMensaje('green');
-      setMensaje('Inicio de sesión exitoso');
-
-      // Espera 1 segundo antes de redirigir
-      setTimeout(() => {
-        if (data.rol === 'jefe') {
-          router.push('/Panel-Admin');
-        } else if (data.rol === 'barbero') {
-          router.push('/Panel-Barbero');
-        }
-      }, 1000);
+      if (data.rol === 'jefe') {
+        localStorage.setItem('isAdminLoggedIn', 'true');
+        localStorage.setItem('adminUser', data.usuario);
+        router.push('/Panel-Admin');
+      } else if (data.rol === 'barbero') {
+        localStorage.setItem('isBarberLoggedIn', 'true');
+        localStorage.setItem('barberUser', data.usuario); 
+        router.push('/Panel-Barbero');
+      } else {
+        setError('Rol no reconocido por el servidor.');
+      }
     } catch (err) {
       console.error(err);
-      setColorMensaje('red');
-      setMensaje('Error al conectar con el servidor');
+      setError('Error de conexión con el servidor');
     }
   };
 
   return (
     <section className="login-container">
       <div className="login-box">
-        <h2>Acceso de Jefe o Barbero</h2>
+        <h2>Acceso de Personal</h2>
 
-        {mensaje && (
-          <div
-            style={{
-              color: colorMensaje,
-              backgroundColor: colorMensaje === 'green' ? '#d4edda' : '#f8d7da',
-              padding: '8px',
-              borderRadius: '6px',
-              marginBottom: '10px',
-              textAlign: 'center',
-            }}
-          >
-            {mensaje}
-          </div>
-        )}
+        {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleLogin}>
           <div className="form-group">
@@ -84,7 +67,6 @@ export default function Login() {
               required
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="contrasena">Contraseña:</label>
             <input
@@ -95,15 +77,15 @@ export default function Login() {
               required
             />
           </div>
-
           <button type="submit" className="btn-login">
             Iniciar Sesión
           </button>
         </form>
-
         <div className="login-footer">
           <Link href="/" legacyBehavior>
-            <a className="btn-back-home">Volver al Inicio</a>
+            <a className="btn-back-home">
+              <i className="fas fa-home"></i> Volver al Inicio
+            </a>
           </Link>
         </div>
       </div>
