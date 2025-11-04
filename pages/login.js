@@ -5,7 +5,8 @@ import Link from 'next/link';
 export default function Login() {
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
-  const [error, setError] = useState('');
+  const [mensaje, setMensaje] = useState('');
+  const [colorMensaje, setColorMensaje] = useState('');
   const router = useRouter();
 
   const backendUrl =
@@ -14,7 +15,7 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
+    setMensaje('');
 
     try {
       const res = await fetch(`${backendUrl}/login/`, {
@@ -26,32 +27,51 @@ export default function Login() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.detail || 'Usuario o contraseña incorrectos');
+        setColorMensaje('red');
+        setMensaje(data.detail || 'Usuario o contraseña incorrectos');
         return;
       }
 
       localStorage.setItem('usuario', data.usuario);
       localStorage.setItem('rol', data.rol);
 
-      alert('Login exitoso ✅');
+      setColorMensaje('green');
+      setMensaje('Inicio de sesión exitoso');
 
-      if (data.rol === 'admin') {
-        router.push('/Panel-Admin');
-      } else if (data.rol === 'barbero') {
-        router.push('/Panel-Barbero');
-      }
+      // Espera 1 segundo antes de redirigir
+      setTimeout(() => {
+        if (data.rol === 'jefe') {
+          router.push('/Panel-Admin');
+        } else if (data.rol === 'barbero') {
+          router.push('/Panel-Barbero');
+        }
+      }, 1000);
     } catch (err) {
       console.error(err);
-      setError('Error al conectar con el servidor');
+      setColorMensaje('red');
+      setMensaje('Error al conectar con el servidor');
     }
   };
 
   return (
     <section className="login-container">
       <div className="login-box">
-        <h2>Acceso de Administrador o Barbero</h2>
+        <h2>Acceso de Jefe o Barbero</h2>
 
-        {error && <div className="error-message">{error}</div>}
+        {mensaje && (
+          <div
+            style={{
+              color: colorMensaje,
+              backgroundColor: colorMensaje === 'green' ? '#d4edda' : '#f8d7da',
+              padding: '8px',
+              borderRadius: '6px',
+              marginBottom: '10px',
+              textAlign: 'center',
+            }}
+          >
+            {mensaje}
+          </div>
+        )}
 
         <form onSubmit={handleLogin}>
           <div className="form-group">
