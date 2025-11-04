@@ -87,7 +87,7 @@ export default function AdminPanel() {
     }
   };
 
-  // Función de Gestión de Disponibilidad 
+  //  Función de Gestión de Disponibilidad 
   const agregarDisponibilidad = async () => {
     const fecha = prompt("Ingrese la fecha (YYYY-MM-DD):");
     const hora_inicio = prompt("Ingrese la hora de inicio (HH:MM):");
