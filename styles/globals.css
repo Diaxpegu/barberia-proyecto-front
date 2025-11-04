@@ -1945,4 +1945,83 @@ footer {
     font-size: 2rem;
   }
 }
+.dash-wrap {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  background: #f7f8fb; /* Un fondo claro para el contenido */
+}
 
+.sidebar {
+  /* Usamos tu color primario del header/footer */
+  background: var(--color-primary, #1a1a1a);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 24px;
+}
+
+.brand a {
+  color: var(--color-secondary, #d4af37); /* Color dorado */
+  font-weight: 700;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.brand small {
+  display: block;
+  opacity: 0.7;
+  margin-top: 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+}
+
+.menu {
+  display: grid;
+  gap: 10px;
+}
+
+.menu a {
+  color: #e5e7eb;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: 0.15s;
+  text-decoration: none;
+}
+
+.menu a:hover,
+.menu a.active { /* Puedes añadir 'active' con useRouter para marcar la ruta */
+  background: #1f2937; /* Un gris oscuro para el hover */
+}
+
+/*
+  Esto sobreescribirá el .btn-logout de <style jsx>
+  y usará el estilo global que ya tenías definido
+*/
+.sidebar .btn-logout {
+  margin-top: auto;
+  background-color: var(--color-accent, #c90a02); /* Rojo de tu tema */
+  border: 0;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  transition: var(--transition);
+}
+
+.sidebar .btn-logout:hover {
+  background-color: #a00800; /* Un rojo más oscuro */
+  transform: translateY(-2px);
+}
+
+.content {
+  padding: 28px 32px;
+}
+
+/* Ajuste para admin (un sidebar un poco más ancho) */
+.dash-wrap.admin {
+  grid-template-columns: 280px 1fr;
+}
