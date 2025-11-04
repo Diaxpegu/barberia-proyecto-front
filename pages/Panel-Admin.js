@@ -6,175 +6,75 @@ export default function AdminPanel() {
   const [data, setData] = useState([]);
   const [columnas, setColumnas] = useState([]);
 
-  const backendUrl = 'https://barberia-proyecto-back-production-f876.up.railway.app';
 
-  const BuscarData = async (endpoint, panelName) => {
+  const backendUrl =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    'https://barberia-proyecto-back-production-f876.up.railway.app';
+
+  const fetchData = async (endpoint, panel) => {
     try {
-      const url = `${backendUrl}${endpoint}`;
-      const res = await fetch(url);
-
-      if (!res.ok) {
-        throw new Error(`Error al obtener datos: ${res.statusText}`);
-      }
-
-      const resultado = await res.json();
-
-      if (resultado && resultado.length > 0) {
-        setColumnas(Object.keys(resultado[0]));
-        setData(resultado);
-      } else {
-        setColumnas([]);
-        setData([]);
-      }
-      setPanelActivo(panelName);
-
-    } catch (err) {
-      console.error(`Error en BuscarData (${panelName}):`, err);
-      alert(`Error al cargar ${panelName}: ${err.message}`);
-      setColumnas([]);
-      setData([]);
-      setPanelActivo(panelName);
-    }
-  };
-
-  //  Funciones de Gestion de Barberos 
-
-  const agregarBarberos = async () => {
-    const nombre = prompt("Ingrese el nombre del barbero:");
-    const especialidad = prompt("Ingrese la especialidad (ej: Cortes, Barba):");
-    if (!nombre) {
-      alert("El nombre es obligatorio.");
-      return;
-    }
-    const nuevoBarbero = {
-      nombre: nombre,
-      especialidad: especialidad || null
-    };
-    try {
-      const res = await fetch(`${backendUrl}/barberos/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevoBarbero),
-      });
-      if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.detail || 'Error del servidor');
-      }
-      const resultado = await res.json();
-      alert(resultado.mensaje || "Barbero agregado");
-      mostrarBarberos();
+      const res = await fetch(`${backendUrl}${endpoint}`);
+      const jsonData = await res.json();
+      setColumns(jsonData.length > 0 ? Object.keys(jsonData[0]) : []);
+      setData(jsonData);
+      setPanelActivo(panel); // Abrir el panel correspondiente
     } catch (err) {
       console.error(err);
-      alert(`Error al agregar barbero: ${err.message}`);
+      alert('Error al obtener los datos');
     }
   };
 
-  const eliminarBarberos = async () => {
-    const id = prompt("Ingrese el ID del barbero a eliminar:");
-    if (!id) return;
-    try {
-      const res = await fetch(`${backendUrl}/barberos/${id}`, { 
-        method: 'DELETE' 
-      });
-      if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.detail || 'Error del servidor');
-      }
-      const resultado = await res.json();
-      alert(resultado.mensaje || "Barbero eliminado");
-      mostrarBarberos(); 
-    } catch (err) {
-      console.error(err);
-      alert(`Error al eliminar barbero: ${err.message}`);
-    }
-  };
+  // Funciones para cada botón
+  const mostrarClientes = () => fetchData('/clientes/', 'clientes');
+  const mostrarBarberos = () => fetchData('/barberos/', 'barberos');
+  const mostrarServicios = () => fetchData('/servicios/', 'servicios');
+  const mostrarProductos = () => fetchData('/productos/', 'productos');
+  const mostrarDisponibilidad = () => fetchData('/disponibilidad/libre/', 'disponibilidad');
+  const mostrarReservasPendientes = () => fetchData('/reservas/pendientes/', 'reservasPendientes');
+  const mostrarReservasDetalle = () => fetchData('/reservas/detalle/', 'reservasDetalle');
 
-  //  Función de Gestión de Disponibilidad 
-
-  const agregarDisponibilidad = async () => {
-    const fecha = prompt("Ingrese la fecha (YYYY-MM-DD):");
-    const hora_inicio = prompt("Ingrese la hora de inicio (HH:MM):");
-    const hora_fin = prompt("Ingrese la hora de fin (HH:MM):");
-    const estado = "disponible";
-    if (!fecha || !hora_inicio || !hora_fin) {
-      alert("Debe completar todos los campos.");
-      return;
-    }
-    const nuevaDisponibilidad = {
-      fecha,
-      hora_inicio,
-      hora_fin,
-      estado,
-      id_barbero: null
-    };
-    try {
-      const res = await fetch(`${backendUrl}/disponibilidad/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevaDisponibilidad),
-      });
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.detail || 'Error del servidor');
-      }
-      const resultado = await res.json();
-      alert(resultado.mensaje || "Disponibilidad agregada correctamente");
-      mostrarDisponibilidad();
-    } catch (err) {
-      console.error(err);
-      alert(`Error al agregar disponibilidad: ${err.message}`);
-    }
-  };
-
-  // Funciones de botones
-
-  const mostrarClientes = () => BuscarData('/clientes/', 'clientes');
-  const mostrarServicios = () => BuscarData('/servicios/', 'servicios');
-  const mostrarProductos = () => BuscarData('/productos/', 'productos');
-  const mostrarDisponibilidad = () => BuscarData('/disponibilidad/libre/', 'disponibilidad');
-  const mostrarReservasPendientes = () => BuscarData('/reservas/pendientes/', 'reservasPendientes');
-  const mostrarReservasDetalle = () => BuscarData('/reservas/detalle/', 'reservasDetalle');
-
+  // Acciones del administrador
   const bloquearHorario = async () => {
-    const id = prompt("Ingrese ID de disponibilidad a bloquear:");
+    const id = prompt('Ingrese el ID de la disponibilidad a bloquear:');
     if (!id) return;
     try {
       const res = await fetch(`${backendUrl}/disponibilidad/bloquear/${id}`, { method: 'PUT' });
-      const resultado = await res.json();
-      alert(resultado.mensaje);
+      const result = await res.json();
+      alert(result.mensaje);
     } catch (err) {
       console.error(err);
-      alert('Error al bloquear horario');
+      alert('Error al bloquear el horario.');
     }
   };
   const confirmarReserva = async () => {
-    const id = prompt("Ingrese ID de reserva a confirmar:");
+    const id = prompt('Ingrese el ID de la reserva a confirmar:');
     if (!id) return;
     try {
       const res = await fetch(`${backendUrl}/reservas/confirmar/${id}`, { method: 'PUT' });
-      const resultado = await res.json();
-      alert(resultado.mensaje);
+      const result = await res.json();
+      alert(result.mensaje);
     } catch (err) {
       console.error(err);
-      alert('Error al confirmar reserva');
+      alert('Error al confirmar la reserva.');
     }
   };
   const cancelarReserva = async () => {
-    const id = prompt("Ingrese ID de reserva a cancelar:");
+    const id = prompt('Ingrese el ID de la reserva a cancelar:');
     if (!id) return;
     try {
       const res = await fetch(`${backendUrl}/reservas/cancelar/${id}`, { method: 'DELETE' });
-      const resultado = await res.json();
-      alert(resultado.mensaje);
+      const result = await res.json();
+      alert(result.mensaje);
     } catch (err) {
       console.error(err);
-      alert('Error al cancelar reserva');
+      alert('Error al cancelar la reserva.');
     }
   };
 
-  // Paneles dinámicos
+  // Render de paneles dinámicos
   const renderPanel = () => {
     if (!panelActivo) return <p>Seleccione una consulta para ver los resultados.</p>;
+
     return (
       <div className="admin-subpanel">
         <h3>
@@ -186,19 +86,20 @@ export default function AdminPanel() {
           {panelActivo === 'reservasPendientes' && 'Reservas Pendientes'}
           {panelActivo === 'reservasDetalle' && 'Todas las Reservas - Detalle Completo'}
         </h3>
+
         {data.length === 0 ? (
-          <p>No hay datos para mostrar</p>
+          <p>No hay datos disponibles</p>
         ) : (
           <table>
             <thead>
               <tr>
-                {columnas.map((col) => <th key={col}>{col}</th>)}
+                {columns.map((col) => <th key={col}>{col}</th>)}
               </tr>
             </thead>
             <tbody>
               {data.map((row, idx) => (
                 <tr key={idx}>
-                  {columnas.map((col) => <td key={col}>{String(row[col])}</td>)}
+                  {columns.map((col) => <td key={col}>{row[col]}</td>)}
                 </tr>
               ))}
             </tbody>
@@ -215,24 +116,25 @@ export default function AdminPanel() {
       <div className="admin-actions-grid">
         <button className="admin-btn" onClick={mostrarClientes}>Mostrar Clientes</button>
         <button className="admin-btn" onClick={mostrarBarberos}>Mostrar Barberos</button>
-        <button className="admin-btn" onClick={agregarBarberos}>Agregar Barbero</button>
-        <button className="admin-btn" onClick={eliminarBarberos}>Eliminar Barbero</button>
         <button className="admin-btn" onClick={mostrarServicios}>Servicios y Precios</button>
         <button className="admin-btn" onClick={mostrarProductos}>Productos y Precios</button>
         <button className="admin-btn" onClick={mostrarDisponibilidad}>Disponibilidad Libre</button>
-        <button className="admin-btn" onClick={agregarDisponibilidad}>Agregar Disponibilidad</button>
         <button className="admin-btn" onClick={mostrarReservasPendientes}>Reservas Pendientes</button>
         <button className="admin-btn" onClick={bloquearHorario}>Bloquear Horario</button>
         <button className="admin-btn" onClick={confirmarReserva}>Confirmar Reserva</button>
         <button className="admin-btn" onClick={cancelarReserva}>Cancelar Reserva</button>
         <button className="admin-btn" onClick={mostrarReservasDetalle}>Detalle Completo Reservas</button>
       </div>
+
+      {/* Panel dinámico */}
       <div className="admin-panel-display">
         {renderPanel()}
       </div>
 
       <div className="admin-footer-actions">
-        <Link href="/"><a className="btn-back-home">Volver al Inicio</a></Link>
+        <Link href="/" legacyBehavior>
+          <a className="btn-back-home">Volver al Inicio</a>
+        </Link>
       </div>
     </section>
   );
