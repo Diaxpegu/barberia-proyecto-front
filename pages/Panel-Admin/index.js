@@ -6,20 +6,27 @@ export default function PanelAdmin() {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     "https://barberia-proyecto-back-production-f876.up.railway.app";
 
-  const [resumen, setResumen] = useState({ clientes: 0, barberos: 0, reservas: 0 });
+  const [resumen, setResumen] = useState({
+    clientes: 0,
+    barberos: 0,
+    reservas: 0,
+    servicios: 0,
+  });
 
   useEffect(() => {
     const cargarResumen = async () => {
       try {
-        const [clientes, barberos, reservas] = await Promise.all([
+        const [clientes, barberos, reservas, servicios] = await Promise.all([
           fetch(`${backendUrl}/clientes/`).then((r) => r.json()),
           fetch(`${backendUrl}/barberos/`).then((r) => r.json()),
-          fetch(`${backendUrl}/reservas/pendientes/`).then((r) => r.json()),
+          fetch(`${backendUrl}/reservas/detalle/`).then((r) => r.json()),
+          fetch(`${backendUrl}/servicios/`).then((r) => r.json()),
         ]);
         setResumen({
           clientes: clientes.length,
           barberos: barberos.length,
           reservas: reservas.length,
+          servicios: servicios.length,
         });
       } catch (err) {
         console.error("Error al cargar resumen:", err);
@@ -30,7 +37,8 @@ export default function PanelAdmin() {
 
   return (
     <DashboardLayoutAdmin usuario="Administrador">
-      <h2>Resumen General</h2>
+      <h2>Panel General</h2>
+      <p>Resumen general del sistema.</p>
       <div className="resumen-grid">
         <div className="card clientes">
           <h4>Clientes</h4>
@@ -41,8 +49,12 @@ export default function PanelAdmin() {
           <span>{resumen.barberos}</span>
         </div>
         <div className="card reservas">
-          <h4>Reservas Pendientes</h4>
+          <h4>Reservas</h4>
           <span>{resumen.reservas}</span>
+        </div>
+        <div className="card servicios">
+          <h4>Servicios</h4>
+          <span>{resumen.servicios}</span>
         </div>
       </div>
 
@@ -69,6 +81,9 @@ export default function PanelAdmin() {
         }
         .reservas {
           background: linear-gradient(135deg, #ffc107, #ff9800);
+        }
+        .servicios {
+          background: linear-gradient(135deg, #6f42c1, #b57edc);
         }
       `}</style>
     </DashboardLayoutAdmin>
