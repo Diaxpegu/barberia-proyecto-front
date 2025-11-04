@@ -1783,3 +1783,32 @@ footer {
   font-size: 1.2rem;
   color: var(--color-gray);
 }
+.estado-pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.estado-confirmado {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.btn-accion-bloquear {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-accion-bloquear:hover {
+  background-color: #c82333;
+}
+.admin-btn.active {
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
+}
