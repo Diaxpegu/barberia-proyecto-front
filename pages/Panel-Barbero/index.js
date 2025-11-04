@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import DashboardLayoutBarbero from "../../components/DashboardLayoutBarbero";
-import DataTable from "../../components/DataTable";
+
 
 export default function PanelBarbero() {
   const backendUrl =
@@ -12,7 +12,7 @@ export default function PanelBarbero() {
 
   useEffect(() => {
     const usuario = localStorage.getItem("barberUser");
-    const id = localStorage.getItem("barberId");
+    const id = localStorage.getItem("barberId") || localStorage.getItem("_id");
     if (!usuario || !id) {
       window.location.href = "/login";
       return;
@@ -22,8 +22,9 @@ export default function PanelBarbero() {
     const cargarAgenda = async () => {
       try {
         const res = await fetch(`${backendUrl}/barbero/agenda/${id}`);
+        if (!res.ok) throw new Error("Error al cargar agenda");
         const data = await res.json();
-        setAgenda(data);
+        setAgenda(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Error al cargar agenda:", err);
       }
@@ -31,13 +32,57 @@ export default function PanelBarbero() {
     cargarAgenda();
   }, [backendUrl]);
 
-  const columnas = ["fecha", "hora", "id_cliente", "id_servicio", "estado"];
-
   return (
     <DashboardLayoutBarbero usuario={barbero?.usuario}>
       <h2>Agenda de Citas</h2>
       <p>Visualiza tus citas pendientes o confirmadas.</p>
-      <DataTable data={agenda} columnas={columnas} />
+
+      {agenda.length === 0 ? (
+        <p>No tienes citas pendientes por ahora.</p>
+      ) : (
+        <table className="tabla-estilizada">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Cliente</th>
+              <th>Servicio</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {agenda.map((item) => (
+              <tr key={item._id}>
+                <td>{item.fecha}</td>
+                <td>{item.hora}</td>
+                <td>{item.cliente?.[0]?.nombre || "N/A"}</td>
+                <td>{item.servicio?.[0]?.nombre_servicio || "N/A"}</td>
+                <td>{item.estado || "pendiente"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <style jsx>{`
+        .tabla-estilizada {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 1rem;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 0.75rem;
+          text-align: center;
+        }
+        th {
+          background: #333;
+          color: white;
+        }
+        tr:nth-child(even) {
+          background: #f9f9f9;
+        }
+      `}</style>
     </DashboardLayoutBarbero>
   );
 }

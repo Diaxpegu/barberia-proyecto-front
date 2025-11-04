@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import DashboardLayoutBarbero from "../../components/DashboardLayoutBarbero";
 
-
 export default function PerfilBarbero() {
   const backendUrl =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
@@ -12,23 +11,28 @@ export default function PerfilBarbero() {
   const [nuevaEspecialidad, setNuevaEspecialidad] = useState("");
 
   useEffect(() => {
-    const id = localStorage.getItem("barberId");
+    const id = localStorage.getItem("barberId") || localStorage.getItem("_id");
     if (!id) {
       window.location.href = "/login";
       return;
     }
     const cargarBarbero = async () => {
-      const res = await fetch(`${backendUrl}/barberos/${id}`);
-      const data = await res.json();
-      setBarbero(data);
-      setNuevoNombre(data.nombre || "");
-      setNuevaEspecialidad(data.especialidad || "");
+      try {
+        const res = await fetch(`${backendUrl}/barberos/${id}`);
+        if (!res.ok) throw new Error("Error al cargar barbero");
+        const data = await res.json();
+        setBarbero(data);
+        setNuevoNombre(data.nombre || "");
+        setNuevaEspecialidad(data.especialidad || "");
+      } catch (err) {
+        console.error(err);
+      }
     };
     cargarBarbero();
   }, [backendUrl]);
 
   const guardarCambios = async () => {
-    alert("Por ahora este formulario es solo de muestra. (PUT pendiente)");
+    alert("Funcionalidad pendiente (PUT en desarrollo)");
   };
 
   if (!barbero) return <p>Cargando perfil...</p>;
