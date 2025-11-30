@@ -44,11 +44,14 @@ header {
 .header-container {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    /* Alineación centrada verticalmente */
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
+/* Estilo original de btn-volver (se mantiene por si se usa en otros lados) */
 .btn-volver {
     display: inline-flex;
     align-items: center;
@@ -172,7 +175,6 @@ footer {
     margin-bottom: 30px;
     padding: 2rem;
     background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/valiant.jpg') center/cover no-repeat;
-    /* Updated path */
     color: white;
 }
 
@@ -363,7 +365,7 @@ footer {
     transform: scale(1.03);
 }
 
-/* ESTILOS ORIGINALES PARA SECCIÓN RESERVA */
+/* SECCIÓN RESERVA */
 .reserva-container {
     background: white;
     padding: 2rem;
@@ -406,7 +408,7 @@ footer {
     box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
 }
 
-/* ESTILOS ORIGINALES PARA HORARIOS */
+/* HORARIOS */
 .horarios-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -457,7 +459,7 @@ footer {
     box-shadow: var(--shadow);
 }
 
-/* ESTILOS BOTÓN CONFIRMAR */
+/* BOTÓN CONFIRMAR */
 .btn-confirmar {
     background-color: var(--color-secondary);
     color: var(--color-primary);
@@ -483,7 +485,7 @@ footer {
     box-shadow: var(--shadow);
 }
 
-/* ESTILOS PARA ERRORES */
+/* ERRORES */
 .error-message {
     background-color: #f8d7da;
     color: #721c24;
@@ -498,7 +500,7 @@ footer {
     margin-right: 10px;
 }
 
-/* ESTILO PARA HORARIO SELECCIONADO */
+/* HORARIO SELECCIONADO */
 .hora-slot input[type="radio"]:checked+label {
     background-color: var(--color-secondary);
     border: 2px solid var(--color-secondary);
@@ -511,7 +513,7 @@ footer {
     outline: 2px solid var(--color-secondary);
 }
 
-/* Estilos para el panel del peluquero - versión lista */
+/* Panel peluquero (versión lista) */
 .panel-container {
     background: white;
     padding: 2rem;
@@ -576,7 +578,7 @@ footer {
     color: var(--color-primary);
 }
 
-/* Estilos para el calendario */
+/* Calendario */
 .datepicker {
     width: 100%;
     padding: 12px 15px;
@@ -589,103 +591,7 @@ footer {
     font-size: 1rem;
 }
 
-#calendar-container {
-    display: none;
-    margin-top: 10px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 10px;
-    box-shadow: var(--shadow);
-    z-index: 1000;
-    position: relative;
-}
-
-.calendar {
-    width: 100%;
-}
-
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.calendar-title {
-    font-weight: bold;
-    color: var(--color-primary);
-    font-size: 1.1rem;
-}
-
-.calendar-nav {
-    display: flex;
-    gap: 10px;
-}
-
-.calendar-nav button {
-    background: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 5px 10px;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.calendar-nav button:hover {
-    background: #000;
-}
-
-.calendar-weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: var(--color-primary);
-}
-
-.calendar-days {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-}
-
-.calendar-day {
-    padding: 8px;
-    text-align: center;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.calendar-day:hover {
-    background: #f0f0f0;
-}
-
-.calendar-day.available {
-    background: #d4edda;
-    color: #155724;
-}
-
-.calendar-day.unavailable {
-    color: #ccc;
-    cursor: not-allowed;
-}
-
-.calendar-day.selected {
-    background: var(--color-secondary);
-    color: var(--color-primary);
-    font-weight: bold;
-}
-
-.calendar-day.weekend {
-    color: #ccc;
-    cursor: not-allowed;
-}
-
-/* Sección Quienes somos */
+/* Quienes somos */
 .about-section {
     padding: 3rem 2rem;
     background: white;
@@ -724,7 +630,7 @@ footer {
     object-fit: cover;
 }
 
-/* Contactanos*/
+/* Contactanos */
 .contact-section {
     padding: 3rem 2rem;
     background: #f5f5f5;
@@ -926,7 +832,7 @@ footer {
     }
 }
 
-/* Estilos para el sistema de reservas de múltiples pasos */
+/* Sistema de reservas de múltiples pasos */
 .reserva-steps {
     display: flex;
     justify-content: center;
@@ -1085,7 +991,7 @@ footer {
     color: var(--color-primary);
 }
 
-/* Responsive */
+/* Responsive Reserva Summary */
 @media (max-width: 1200px) {
     .reserva-summary {
         position: static;
@@ -1121,366 +1027,12 @@ footer {
     }
 }
 
-/* styles/reserva.module.css o añadir a globals.css */
-
-.reserva-container {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    /* Contenido principal y sidebar de resumen */
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: var(--color-background-light);
-    /* Asume que tienes variables CSS */
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-    /* Asume que tienes variables CSS */
-}
-
-.reserva-container h2 {
-    grid-column: 1 / -1;
-    /* Ocupa todo el ancho */
-    text-align: center;
-    color: var(--color-primary);
-    margin-bottom: 1.5rem;
-}
-
-.reserva-container .instagram {
-    grid-column: 1 / -1;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: var(--color-text-secondary);
-}
-
-.reserva-container .instagram a {
-    color: var(--color-secondary);
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.error-message {
-    grid-column: 1 / -1;
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* Indicador de pasos */
-.reserva-steps {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 2rem;
-    gap: 1rem;
-}
-
-.reserva-steps .step {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 25px;
-    background-color: var(--color-light-gray);
-    color: var(--color-text-secondary);
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
-
-.reserva-steps .step.active {
-    background-color: var(--color-primary);
-    color: white;
-    box-shadow: var(--shadow-md);
-}
-
-.reserva-steps .step-number {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background-color: white;
-    color: var(--color-primary);
-    font-size: 0.9rem;
-}
-
-.reserva-steps .step.active .step-number {
-    background-color: var(--color-secondary);
-    color: white;
-}
-
-/* Formulario */
-.reserva-form {
-    grid-column: 1 / 2;
-    /* Ocupa la primera columna */
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: var(--shadow-sm);
-}
-
-.form-step {
-    display: none;
-    /* Oculta los pasos por defecto */
-}
-
-.form-step.active {
-    display: block;
-    /* Muestra el paso activo */
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-    color: var(--color-text-primary);
-}
-
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="tel"],
-.form-group input[type="date"],
-.form-group select {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    /* Asegura que padding no aumente el ancho */
-}
-
-.form-group input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.5);
-    /* Ajusta el color del icono del calendario */
-}
-
-/* Horarios */
-.time-sections {
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 1rem;
-}
-
-.time-section {
-    flex: 1;
-    background-color: var(--color-light-gray);
-    padding: 1rem;
-    border-radius: 8px;
-}
-
-.time-section h4 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: var(--color-primary);
-    text-align: center;
-}
-
-.horarios-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 0.5rem;
-}
-
-.hora-slot {
-    background-color: white;
-    border: 1px solid var(--color-border);
-    border-radius: 5px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.hora-slot input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    z-index: 1;
-}
-
-.hora-slot label {
-    display: block;
-    padding: 0.8rem 0.5rem;
-    font-weight: normal;
-    color: var(--color-text-primary);
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    position: relative;
-    z-index: 0;
-}
-
-.hora-slot.disponible label {
-    background-color: #e6ffe6;
-    /* Verde claro */
-}
-
-.hora-slot.disponible input[type="radio"]:checked+label {
-    background-color: var(--color-secondary);
-    /* Verde más oscuro al seleccionar */
-    color: white;
-}
-
-.hora-slot.ocupado {
-    background-color: #ffe6e6;
-    /* Rojo claro */
-    color: var(--color-text-secondary);
-    cursor: not-allowed;
-}
-
-.hora-slot.ocupado label {
-    text-decoration: line-through;
-    color: var(--color-text-secondary);
-    cursor: not-allowed;
-}
-
-.hora-slot.no-disponible {
-    background-color: var(--color-light-gray);
-    color: var(--color-text-secondary);
-    cursor: not-allowed;
-}
-
-.hora-slot.no-disponible label {
-    text-decoration: line-through;
-    color: var(--color-text-secondary);
-    cursor: not-allowed;
-}
-
-.hora-slot .estado {
-    font-size: 0.8em;
-    display: block;
-    margin-top: 0.2em;
-}
-
-/* Navegación del formulario */
-.form-navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-}
-
-.btn-next,
-.btn-prev,
-.btn-confirmar {
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.btn-next,
-.btn-confirmar {
-    background-color: var(--color-primary);
-    color: white;
-}
-
-.btn-next:hover,
-.btn-confirmar:hover {
-    background-color: var(--color-secondary);
-    transform: translateY(-2px);
-}
-
-.btn-prev {
-    background-color: var(--color-light-gray);
-    color: var(--color-text-primary);
-}
-
-.btn-prev:hover {
-    background-color: var(--color-border);
-    transform: translateY(-2px);
-}
-
-/* Resumen de la reserva (sidebar) */
-.reserva-summary {
-    grid-column: 2 / 3;
-    /* Ocupa la segunda columna */
-    color: var(--color-primary);
-    text-align: center;
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: 1rem;
-}
-
-.summary-content .summary-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.8rem;
-    font-size: 0.95rem;
-}
-
-.summary-content .summary-item strong {
-    color: var(--color-text-primary);
-}
-
-.summary-content .summary-item span {
-    color: var(--color-text-secondary);
-}
-
-/* Media Queries para responsividad */
-@media (max-width: 992px) {
-    .reserva-container {
-        grid-template-columns: 1fr;
-        /* Una sola columna en pantallas pequeñas */
-        padding: 1rem;
-    }
-
-    .reserva-summary {
-        grid-column: 1 / -1;
-        /* Ocupa todo el ancho */
-        position: static;
-        /* No sticky en móvil */
-        margin-top: 2rem;
-    }
-
-    .time-sections {
-        flex-direction: column;
-        /* Horarios en columna */
-    }
-}
-
-@media (max-width: 576px) {
-    .reserva-steps {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .reserva-steps .step {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .form-navigation {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .btn-next,
-    .btn-prev,
-    .btn-confirmar {
-        width: 100%;
-    }
-}
-
-/* Estilos para la página de Login */
+/* Login Page Styles */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: calc(100vh - 120px);
-    /* Ajusta según la altura de tu header/footer */
     background-color: var(--color-light);
     padding: 2rem;
 }
@@ -1582,7 +1134,7 @@ footer {
     transform: translateY(-2px);
 }
 
-/* Estilos para el Panel de Administración */
+/* Panel Admin */
 .admin-panel-container {
     background: white;
     padding: 3rem;
@@ -1680,29 +1232,7 @@ footer {
     box-shadow: var(--shadow);
 }
 
-/* Media Queries para responsividad del panel */
-@media (max-width: 768px) {
-    .admin-panel-container {
-        padding: 2rem;
-    }
-
-    .admin-actions-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .admin-footer-actions {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .btn-logout,
-    .admin-footer-actions .btn-back-home {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-/* Estilos para el contenedor del video */
+/* Video */
 .about-image,
 .video-container {
     position: relative;
@@ -1714,7 +1244,6 @@ footer {
     margin: 0 auto;
 }
 
-/* Estilos para que el video abarque todo el espacio del contenedor */
 .full-cover-video {
     position: absolute;
     top: 0;
@@ -1725,131 +1254,7 @@ footer {
     display: block;
 }
 
-/* Estilos para la gestión de jefes */
-.jefes-section {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.jefes-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.jefe-card {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid var(--color-secondary);
-}
-
-.jefe-card h4 {
-    margin: 0 0 0.5rem 0;
-    color: var(--color-primary);
-}
-
-.jefe-card p {
-    margin: 0.25rem 0;
-    font-size: 0.9rem;
-}
-
-/* Modal styles */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-content h3 {
-    margin-top: 0;
-    color: var(--color-primary);
-}
-
-.modal-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.btn-cancelar {
-    background: #6c757d;
-    color: white;
-    border: none;
-    padding: 0.8rem 1.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.btn-cancelar:hover {
-    background: #5a6268;
-}
-
-.loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50vh;
-    font-size: 1.2rem;
-    color: var(--color-gray);
-}
-
-.estado-pendiente {
-    background-color: #fff3cd;
-    color: #856404;
-    padding: 5px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-}
-
-.estado-confirmado {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 5px 8px;
-    border-radius: 4px;
-    font-weight: 500;
-}
-
-.btn-accion-bloquear {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.btn-accion-bloquear:hover {
-    background-color: #c82333;
-}
-
-.admin-btn.active {
-    background-color: var(--color-secondary);
-    color: var(--color-primary);
-}
-
-
+/* Confirmacion Page */
 .confirmacion-page-wrapper {
     display: flex;
     justify-content: center;
@@ -1868,7 +1273,6 @@ footer {
     width: 100%;
     text-align: center;
 }
-
 
 .confirmacion-card .confirmacion-header {
     margin-bottom: 1.5rem;
@@ -1891,7 +1295,6 @@ footer {
     color: var(--color-gray);
     margin: 0;
 }
-
 
 .confirmacion-card .confirmacion-detalles {
     margin-top: 2rem;
@@ -1931,7 +1334,6 @@ footer {
     color: var(--color-gray);
 }
 
-
 .confirmacion-card .confirmacion-info {
     margin-top: 2rem;
     padding-top: 2rem;
@@ -1957,7 +1359,6 @@ footer {
 .confirmacion-card .confirmacion-acciones {
     margin-top: 2.5rem;
 }
-
 
 .confirmacion-card .btn-back-home {
     background-color: var(--color-primary);
@@ -1985,133 +1386,49 @@ footer {
     }
 }
 
-.dash-wrap {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    min-height: 100vh;
-    background: #f7f8fb;
-    /* Un fondo claro para el contenido */
-}
-
-.sidebar {
-    /* Usamos tu color primario del header/footer */
-    background: var(--color-primary, #1a1a1a);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    gap: 24px;
-}
-
-.brand a {
-    color: var(--color-secondary, #d4af37);
-    /* Color dorado */
-    font-weight: 700;
-    font-size: 18px;
+/* =========================================================
+   NUEVA CLASE UNIFICADA PARA BOTONES DEL HEADER
+   (Inicio y Login iguales)
+   ========================================================= */
+.btn-header {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 20px;
+    background-color: rgba(255, 255, 255, 0.15);
+    /* Efecto cristal */
+    color: #ffffff;
     text-decoration: none;
-}
-
-.brand small {
-    display: block;
-    opacity: 0.7;
-    margin-top: 6px;
-    font-family: 'Montserrat', sans-serif;
+    border-radius: 6px;
+    font-size: 0.95rem;
     font-weight: 500;
-}
-
-.menu {
-    display: grid;
-    gap: 10px;
-}
-
-.menu a {
-    color: #e5e7eb;
-    padding: 10px 12px;
-    border-radius: 8px;
-    transition: 0.15s;
-    text-decoration: none;
-}
-
-.menu a:hover,
-.menu a.active {
-    /* Puedes añadir 'active' con useRouter para marcar la ruta */
-    background: #1f2937;
-    /* Un gris oscuro para el hover */
-}
-
-/*
-  Esto sobreescribirá el .btn-logout de <style jsx>
-  y usará el estilo global que ya tenías definido
-*/
-.sidebar .btn-logout {
-    margin-top: auto;
-    background-color: var(--color-accent, #c90a02);
-    /* Rojo de tu tema */
-    border: 0;
-    color: #fff;
-    padding: 10px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    font-family: 'Montserrat', sans-serif;
-    transition: var(--transition);
-}
-
-.sidebar .btn-logout:hover {
-    background-color: #a00800;
-    /* Un rojo más oscuro */
-    transform: translateY(-2px);
-}
-
-.content {
-    padding: 28px 32px;
-}
-
-/* Ajuste para admin (un sidebar un poco más ancho) */
-.dash-wrap.admin {
-    grid-template-columns: 280px 1fr;
-}
-
-/* Estilos para Slots de Horarios     */
-.hora-slot {
-    display: block;
-}
-
-.hora-slot.disponible label {
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    color: #155724;
-    cursor: pointer;
-}
-
-.hora-slot.disponible:hover label {
-    background-color: #c3e6cb;
-}
-
-.hora-slot input[type="radio"]:checked+label {
-    background-color: var(--color-secondary, #d4af37);
-    border-color: var(--color-secondary);
-    color: var(--color-primary, #1a1a1a);
-    font-weight: bold;
-}
-
-.hora-slot.ocupado label,
-.hora-slot.pendiente label {
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    color: #721c24;
-    cursor: not-allowed;
-    text-decoration: line-through;
-}
-
-.hora-slot label {
-    display: block;
-    padding: 10px;
-    border-radius: 4px;
-    text-align: center;
     transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    height: 40px;
+    min-width: 100px;
+    cursor: pointer;
 }
 
-.hora-slot input[type="radio"] {
-    display: none;
+.btn-header:hover {
+    background-color: var(--color-secondary);
+    /* Dorado */
+    color: var(--color-primary);
+    /* Negro */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    border-color: var(--color-secondary);
+}
+
+.btn-header i {
+    margin-right: 8px;
+    font-size: 1rem;
+}
+
+/* Ajuste responsive para los botones del header */
+@media (max-width: 768px) {
+    .btn-header {
+        width: 100%;
+        max-width: 200px;
+        margin-bottom: 5px;
+    }
 }
