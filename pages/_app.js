@@ -29,7 +29,11 @@ export default function MyApp({ Component, pageProps }) {
           <div>
             <h1>V A L I A N T</h1>
           </div>
-          <div></div>
+          <div>
+            <a href="/login" className="btn-login">
+              <i className="fas fa-user"></i> Login
+            </a>
+          </div>
         </div>
       </header>
 
