@@ -8,6 +8,7 @@ export default function MyApp({ Component, pageProps }) {
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>VALIANT Barbería</title>
+        {/* Fuentes e Iconos */}
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -20,16 +21,19 @@ export default function MyApp({ Component, pageProps }) {
 
       <header>
         <div className="header-container">
+          {/* Botón Izquierdo: Inicio */}
           <div>
             <a href="/" className="btn-header">
               <i className="fas fa-home"></i> Inicio
             </a>
           </div>
 
+          {/* Logo Central */}
           <div style={{ textAlign: 'center' }}>
             <h1>V A L I A N T</h1>
           </div>
 
+          {/* Botón Derecho: Login */}
           <div>
             <a href="/login" className="btn-header">
               <i className="fas fa-user"></i> Login
