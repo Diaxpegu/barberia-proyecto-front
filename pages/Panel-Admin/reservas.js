@@ -23,7 +23,7 @@ export default function ReservasAdmin() {
   }, [backendUrl]);
 
   const actualizarEstado = async (id, nuevoEstado) => {
-    if (!confirm(`¿Marcar esta reserva como "${nuevoEstado}"?`)) return;
+    if (!confirm(`¿Marcar reserva como "${nuevoEstado}"?`)) return;
 
     try {
       const res = await fetch(`${backendUrl}/reservas/${id}`, {
@@ -36,7 +36,7 @@ export default function ReservasAdmin() {
         alert("Estado actualizado correctamente");
         cargarReservas();
       } else {
-        alert("Error al actualizar el estado");
+        alert("Error al actualizar");
       }
     } catch (error) {
       console.error(error);
@@ -70,20 +70,18 @@ export default function ReservasAdmin() {
               </tr>
             ) : (
               reservas.map((reserva) => {
-                const nombreCliente =
-                  reserva.cliente && reserva.cliente[0]
-                    ? `${reserva.cliente[0].nombre} ${reserva.cliente[0].apellido}`
-                    : "Cliente desconocido";
+                // Prevenir errores si vienen datos vacíos
+                const cliente = reserva.cliente && reserva.cliente[0]
+                  ? `${reserva.cliente[0].nombre} ${reserva.cliente[0].apellido || ''}`
+                  : "Cliente desconocido";
 
-                const nombreBarbero =
-                  reserva.barbero && reserva.barbero[0]
-                    ? reserva.barbero[0].nombre
-                    : "Barbero no asignado";
+                const barbero = reserva.barbero && reserva.barbero[0]
+                  ? reserva.barbero[0].nombre
+                  : "Sin asignar";
 
-                const nombreServicio =
-                  reserva.servicio && reserva.servicio[0]
-                    ? reserva.servicio[0].nombre_servicio
-                    : reserva.servicio_nombre || "-";
+                const servicio = reserva.servicio && reserva.servicio[0]
+                  ? reserva.servicio[0].nombre_servicio
+                  : reserva.servicio_nombre || "-";
 
                 return (
                   <tr key={reserva._id}>
@@ -91,11 +89,11 @@ export default function ReservasAdmin() {
                       {reserva.fecha} <br />
                       <small>{reserva.hora}</small>
                     </td>
-                    <td>{nombreCliente}</td>
-                    <td>{nombreBarbero}</td>
-                    <td>{nombreServicio}</td>
+                    <td>{cliente}</td>
+                    <td>{barbero}</td>
+                    <td>{servicio}</td>
                     <td>
-                      <span className={`badge ${reserva.estado}`}>
+                      <span className={`badge ${reserva.estado ? reserva.estado.replace(" ", "-") : "pendiente"}`}>
                         {reserva.estado || "pendiente"}
                       </span>
                     </td>
@@ -104,12 +102,14 @@ export default function ReservasAdmin() {
                         <button
                           className="btn-asistio"
                           onClick={() => actualizarEstado(reserva._id, "asistio")}
+                          title="Marcar como Asistió"
                         >
                           <i className="fas fa-check"></i> Asistió
                         </button>
                         <button
                           className="btn-no-asistio"
                           onClick={() => actualizarEstado(reserva._id, "no asistio")}
+                          title="Marcar como No Asistió"
                         >
                           <i className="fas fa-times"></i> Faltó
                         </button>

@@ -13,15 +13,20 @@ export default function ClientesAdmin() {
       try {
         const r = await fetch(`${backendUrl}/clientes/`);
         const data = await r.json();
+
+        console.log("DATOS CRUDOS DEL BACKEND:", data);
+
         const form = (Array.isArray(data) ? data : []).map((c) => ({
-          nombre: c.nombre || "-",
-          apellido: c.apellido || "-",
-          email: c.email || "-",
-          telefono: c.telefono || "-",
+          _id: c._id,
+          nombre: c.nombre || "Sin nombre",
+          apellido: c.apellido || c.apellidos || "-",
+          email: c.email || c.correo || c.mail || "-",
+          telefono: c.telefono || c.celular || "-",
         }));
+
         setRows(form);
       } catch (e) {
-        console.error(e);
+        console.error("Error cargando clientes:", e);
         setRows([]);
       }
     };
@@ -30,8 +35,11 @@ export default function ClientesAdmin() {
 
   return (
     <DashboardLayoutAdmin usuario="Administrador">
-      <h2>Clientes</h2>
-      <DataTable columnas={["nombre", "apellido", "email", "telefono"]} data={rows} />
+      <h2>Gestión de Clientes</h2>
+      <DataTable
+        columnas={["nombre", "apellido", "email", "telefono"]}
+        data={rows}
+      />
     </DashboardLayoutAdmin>
   );
 }
