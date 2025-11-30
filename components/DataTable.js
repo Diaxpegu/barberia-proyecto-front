@@ -1,5 +1,6 @@
 export default function DataTable({ columnas = [], data = [] }) {
-  const safeCols = columnas.filter((c) => c !== "_id" && c !== "contrasena");
+  // Filtramos columnas sensibles
+  const safeCols = columnas.filter((c) => c !== "contrasena");
 
   return (
     <div className="tabla-wrap">
@@ -29,37 +30,6 @@ export default function DataTable({ columnas = [], data = [] }) {
           )}
         </tbody>
       </table>
-
-      <style jsx>{`
-        .tabla-wrap {
-          background: #fff;
-          border-radius: 14px;
-          box-shadow: 0 10px 20px rgba(0,0,0,0.06);
-          overflow: hidden;
-        }
-        .tabla {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        th {
-          text-align: left;
-          background: #111827;
-          color: #fff;
-          padding: 14px;
-          font-weight: 600;
-          font-size: 14px;
-          letter-spacing: 0.3px;
-        }
-        td {
-          padding: 12px 14px;
-          border-top: 1px solid #eef1f5;
-        }
-        .no-data {
-          text-align: center;
-          padding: 24px;
-          color: #6b7280;
-        }
-      `}</style>
     </div>
   );
 }
@@ -70,6 +40,7 @@ function renderCell(v) {
   if (typeof v === "object") return JSON.stringify(v);
   return String(v);
 }
+
 function formatearCabecera(s) {
   return s
     .replace(/_/g, " ")

@@ -14,13 +14,24 @@ export default function ReportesAdmin() {
           fetch(`${backendUrl}/reservas/detalle/`).then((r) => r.json()),
           fetch(`${backendUrl}/barberos/`).then((r) => r.json()),
         ]);
-        const totales = Array.isArray(resAll) ? resAll.length : 0;
-        const completadas = (Array.isArray(resAll) ? resAll : []).filter(
-          (x) => x.estado === "completado"
+
+        const totalReservas = Array.isArray(resAll) ? resAll.length : 0;
+
+        const reservasCompletadas = (Array.isArray(resAll) ? resAll : []).filter(
+          (x) => {
+            const estado = x.estado ? x.estado.toLowerCase() : "";
+            return estado === "completado" || estado === "asistio" || estado === "finalizado";
+          }
         ).length;
-        setKpi({ totales, completadas, barberos: resBarberos.length || 0 });
+
+        setKpi({
+          totales: totalReservas,
+          completadas: reservasCompletadas,
+          barberos: Array.isArray(resBarberos) ? resBarberos.length : 0
+        });
+
       } catch (e) {
-        console.error(e);
+        console.error("Error cargando reportes:", e);
       }
     };
     cargar();
@@ -29,28 +40,20 @@ export default function ReportesAdmin() {
   return (
     <DashboardLayoutAdmin usuario="Administrador">
       <h2>Reportes Generales</h2>
-      <div className="cards">
-        <div className="card"><h4>Reservas Totales</h4><b>{kpi.totales}</b></div>
-        <div className="card"><h4>Completadas</h4><b>{kpi.completadas}</b></div>
-        <div className="card"><h4>Barberos Activos</h4><b>{kpi.barberos}</b></div>
+      <div className="cards-grid">
+        <div className="card-reporte">
+          <h4>Reservas Totales</h4>
+          <b>{kpi.totales}</b>
+        </div>
+        <div className="card-reporte">
+          <h4>Asistencias / Completadas</h4>
+          <b>{kpi.completadas}</b>
+        </div>
+        <div className="card-reporte">
+          <h4>Barberos Activos</h4>
+          <b>{kpi.barberos}</b>
+        </div>
       </div>
-
-      <style jsx>{`
-        .cards {
-          display: grid;
-          grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
-          gap: 16px;
-          margin-top: 16px;
-        }
-        .card {
-          background: #fff;
-          border-radius: 14px;
-          padding: 18px;
-          box-shadow: 0 10px 20px rgba(0,0,0,0.06);
-        }
-        .card h4 { margin: 0 0 6px; color: #334155; }
-        .card b { font-size: 28px; color: #1d4ed8; }
-      `}</style>
     </DashboardLayoutAdmin>
   );
 }

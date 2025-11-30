@@ -1752,3 +1752,157 @@ footer {
 .card.servicios {
     border-left-color: #8b5cf6;
 }
+
+/* =========================================
+   ESTILOS DE TABLAS (DataTable y Reservas)
+   ========================================= */
+.tabla-wrap,
+.tabla-container {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    overflow-x: auto;
+    /* Scroll horizontal si es necesario */
+    margin-bottom: 2rem;
+}
+
+.tabla,
+.tabla-custom {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Cabeceras */
+.tabla th,
+.tabla-custom th {
+    text-align: left;
+    background: #111827;
+    /* Oscuro elegante */
+    color: #fff;
+    padding: 14px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+/* Celdas */
+.tabla td,
+.tabla-custom td {
+    padding: 12px 14px;
+    border-top: 1px solid #eef1f5;
+    font-size: 0.95rem;
+    color: #374151;
+    vertical-align: middle;
+}
+
+.no-data {
+    text-align: center;
+    padding: 24px;
+    color: #6b7280;
+}
+
+/* =========================================
+   ESTILOS ESPECÍFICOS: RESERVAS
+   ========================================= */
+.acciones-btns {
+    display: flex;
+    gap: 5px;
+}
+
+.acciones-btns button {
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.btn-asistio {
+    background-color: #10b981;
+}
+
+.btn-asistio:hover {
+    background-color: #059669;
+}
+
+.btn-no-asistio {
+    background-color: #ef4444;
+}
+
+.btn-no-asistio:hover {
+    background-color: #dc2626;
+}
+
+/* Badges (Etiquetas de estado) */
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    display: inline-block;
+}
+
+.badge.pendiente {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.badge.asistio,
+.badge.completado {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+.badge.cancelado,
+.badge.no.asistio {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* =========================================
+   ESTILOS DE REPORTES (Tarjetas)
+   ========================================= */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.card-reporte {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    border-top: 4px solid var(--color-secondary);
+    /* Dorado */
+    transition: transform 0.2s;
+}
+
+.card-reporte:hover {
+    transform: translateY(-3px);
+}
+
+.card-reporte h4 {
+    margin: 0 0 10px;
+    color: #64748b;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+}
+
+.card-reporte b {
+    font-size: 36px;
+    color: #1e293b;
+    font-family: 'Bebas Neue', sans-serif;
+}
