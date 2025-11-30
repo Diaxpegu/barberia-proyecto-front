@@ -1386,10 +1386,7 @@ footer {
     }
 }
 
-/* =========================================================
-   NUEVA CLASE UNIFICADA PARA BOTONES DEL HEADER
-   (Inicio y Login iguales)
-   ========================================================= */
+/* NUEVA CLASE UNIFICADA PARA BOTONES DEL HEADER (Inicio y Login iguales) */
 .btn-header {
     display: inline-flex;
     align-items: center;
@@ -1424,11 +1421,135 @@ footer {
     font-size: 1rem;
 }
 
-/* Ajuste responsive para los botones del header */
 @media (max-width: 768px) {
     .btn-header {
         width: 100%;
         max-width: 200px;
         margin-bottom: 5px;
     }
+}
+
+.admin-header {
+    margin-bottom: 20px;
+}
+
+.admin-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-admin-action {
+    padding: 10px 16px;
+    border-radius: 6px;
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.btn-admin-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-verde {
+    background-color: #10b981;
+}
+
+.btn-verde:hover {
+    background-color: #059669;
+}
+
+.btn-rojo {
+    background-color: #ef4444;
+}
+
+.btn-rojo:hover {
+    background-color: #dc2626;
+}
+
+.btn-gris {
+    background-color: #9ca3af;
+}
+
+.btn-gris:hover {
+    background-color: #6b7280;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(3px);
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #111827;
+    border-bottom: 2px solid #f3f4f6;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.modal-content p {
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+.modal-content .form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.modal-content .form-group input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
 }
