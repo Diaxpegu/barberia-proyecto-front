@@ -8,10 +8,14 @@ export default function BarberosAdmin() {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     "https://barberia-proyecto-back-production-f876.up.railway.app";
 
+  // Estados de Modales
   const [showModalAgregar, setShowModalAgregar] = useState(false);
   const [showModalEliminar, setShowModalEliminar] = useState(false);
 
-  // ESTADOS PARA FORMULARIOS 
+  // Estado para el Modal de Éxito
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
   const [nuevoBarbero, setNuevoBarbero] = useState({
     nombre: "",
     usuario: "",
@@ -47,7 +51,12 @@ export default function BarberosAdmin() {
     cargar();
   }, []);
 
-  // AGREGAR 
+  // Función auxiliar para mostrar éxito
+  const triggerSuccess = (msg) => {
+    setSuccessMessage(msg);
+    setShowSuccess(true);
+  };
+
   const confirmarAgregar = async (e) => {
     e.preventDefault();
     if (!nuevoBarbero.nombre || !nuevoBarbero.usuario || !nuevoBarbero.contrasena) {
@@ -71,16 +80,16 @@ export default function BarberosAdmin() {
       const out = await res.json();
       if (!res.ok) return alert(out.detail || "Error al crear");
 
-      alert(out.mensaje || "Barbero creado correctamente");
+      // Cerrar modal de formulario y mostrar éxito
       setShowModalAgregar(false);
       setNuevoBarbero({ nombre: "", usuario: "", contrasena: "", especialidad: "" });
       cargar();
+      triggerSuccess(out.mensaje || "Barbero creado correctamente");
     } catch (e) {
       alert("Error de conexión al crear barbero");
     }
   };
 
-  // ELIMINAR 
   const confirmarEliminar = async (e) => {
     e.preventDefault();
     if (!idEliminar) return;
@@ -90,10 +99,11 @@ export default function BarberosAdmin() {
       const out = await res.json();
       if (!res.ok) return alert(out.detail || "Error al eliminar");
 
-      alert(out.mensaje || "Barbero eliminado correctamente");
+      // Cerrar modal de formulario y mostrar éxito
       setShowModalEliminar(false);
       setIdEliminar("");
       cargar();
+      triggerSuccess(out.mensaje || "Barbero eliminado correctamente");
     } catch (e) {
       alert("Error de conexión al eliminar barbero");
     }
@@ -104,7 +114,6 @@ export default function BarberosAdmin() {
       <div className="admin-header">
         <h2>Gestión de Barberos</h2>
 
-        {/* BOTONES*/}
         <div className="admin-toolbar">
           <button className="btn-admin-action btn-verde" onClick={() => setShowModalAgregar(true)}>
             <i className="fas fa-plus"></i> Agregar Barbero
@@ -128,38 +137,19 @@ export default function BarberosAdmin() {
             <form onSubmit={confirmarAgregar}>
               <div className="form-group">
                 <label>Nombre:</label>
-                <input
-                  type="text"
-                  value={nuevoBarbero.nombre}
-                  onChange={(e) => setNuevoBarbero({ ...nuevoBarbero, nombre: e.target.value })}
-                  required
-                />
+                <input type="text" value={nuevoBarbero.nombre} onChange={(e) => setNuevoBarbero({ ...nuevoBarbero, nombre: e.target.value })} required />
               </div>
               <div className="form-group">
                 <label>Usuario (Login):</label>
-                <input
-                  type="text"
-                  value={nuevoBarbero.usuario}
-                  onChange={(e) => setNuevoBarbero({ ...nuevoBarbero, usuario: e.target.value })}
-                  required
-                />
+                <input type="text" value={nuevoBarbero.usuario} onChange={(e) => setNuevoBarbero({ ...nuevoBarbero, usuario: e.target.value })} required />
               </div>
               <div className="form-group">
                 <label>Contraseña:</label>
-                <input
-                  type="password"
-                  value={nuevoBarbero.contrasena}
-                  onChange={(e) => setNuevoBarbero({ ...nuevoBarbero, contrasena: e.target.value })}
-                  required
-                />
+                <input type="password" value={nuevoBarbero.contrasena} onChange={(e) => setNuevoBarbero({ ...nuevoBarbero, contrasena: e.target.value })} required />
               </div>
               <div className="form-group">
                 <label>Especialidad:</label>
-                <input
-                  type="text"
-                  value={nuevoBarbero.especialidad}
-                  onChange={(e) => setNuevoBarbero({ ...nuevoBarbero, especialidad: e.target.value })}
-                />
+                <input type="text" value={nuevoBarbero.especialidad} onChange={(e) => setNuevoBarbero({ ...nuevoBarbero, especialidad: e.target.value })} />
               </div>
               <div className="modal-actions">
                 <button type="button" className="btn-admin-action btn-gris" onClick={() => setShowModalAgregar(false)}>Cancelar</button>
@@ -179,19 +169,27 @@ export default function BarberosAdmin() {
             <form onSubmit={confirmarEliminar}>
               <div className="form-group">
                 <label>ID del Barbero:</label>
-                <input
-                  type="text"
-                  value={idEliminar}
-                  onChange={(e) => setIdEliminar(e.target.value)}
-                  placeholder="Ej: 64f8a..."
-                  required
-                />
+                <input type="text" value={idEliminar} onChange={(e) => setIdEliminar(e.target.value)} placeholder="Ej: 64f8a..." required />
               </div>
               <div className="modal-actions">
                 <button type="button" className="btn-admin-action btn-gris" onClick={() => setShowModalEliminar(false)}>Cancelar</button>
                 <button type="submit" className="btn-admin-action btn-rojo">Eliminar Definitivamente</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE ÉXITO SUPERPUESTO */}
+      {showSuccess && (
+        <div className="modal-overlay">
+          <div className="modal-content success-modal-content">
+            <i className="fas fa-check-circle success-icon"></i>
+            <h3 className="success-title">¡Operación Exitosa!</h3>
+            <p>{successMessage}</p>
+            <button className="success-btn-close" onClick={() => setShowSuccess(false)}>
+              Cerrar
+            </button>
           </div>
         </div>
       )}
