@@ -14,9 +14,10 @@ export default function ClientesAdmin() {
         const r = await fetch(`${backendUrl}/clientes/`);
         const data = await r.json();
 
-        console.log("DATOS CRUDOS DEL BACKEND:", data);
+        // FILTRO: Solo clientes con estado "listo"
+        const clientesListos = (Array.isArray(data) ? data : []).filter(c => c.estado === 'listo');
 
-        const form = (Array.isArray(data) ? data : []).map((c) => ({
+        const form = clientesListos.map((c) => ({
           _id: c._id,
           nombre: c.nombre || "Sin nombre",
           apellido: c.apellido || c.apellidos || "-",
@@ -35,7 +36,9 @@ export default function ClientesAdmin() {
 
   return (
     <DashboardLayoutAdmin usuario="Administrador">
-      <h2>Gestión de Clientes</h2>
+      <h2>Gestión de Clientes (Atendidos)</h2>
+      <p>Mostrando clientes con estado "Listo".</p>
+      {/* Columnas solicitadas */}
       <DataTable
         columnas={["nombre", "apellido", "email", "telefono"]}
         data={rows}
