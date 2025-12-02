@@ -33,6 +33,7 @@ export default function Reserva() {
         const resBarberos = await fetch(`${backendUrl}/barberos/`);
         const todos = await resBarberos.json();
 
+        // Función para crear slugs (igual a la de la pág principal)
         const crearSlug = (nombre) =>
           nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             .replace(/\s+/g, '-')
@@ -177,119 +178,153 @@ export default function Reserva() {
 
   if (!peluquero && !error) {
     return (
-      <div style={{ padding: '3rem', textAlign: 'center' }}>
+      <section className="reserva-container loading-container">
         <p>Cargando información del barbero...</p>
-      </div>
+      </section>
     );
   }
 
   return (
-    <section className="reserva-container">
-      {error && <div className="error-message" style={{ background: '#ffebee', color: '#c62828', padding: '10px', borderRadius: '4px', marginBottom: '1rem' }}>{error}</div>}
+    <>
+      <section className="reserva-container">
 
-      {peluquero && (
-        <>
-          <h2>Reserva con {peluquero.nombre}</h2>
+        {/* FORMULARIO */}
+        <div className="reserva-form-wrapper">
+          {error && <div className="error-message">{error}</div>}
 
-          <form onSubmit={handleSubmit}>
-            {currentStep === 1 && (
-              <div className="form-step active">
-                <div className="form-group">
-                  <label>Fecha:</label>
-                  <input
-                    type="date"
-                    className="datepicker"
-                    value={formData.fecha}
-                    onChange={handleDateChange}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
-                </div>
+          {peluquero && (
+            <>
+              <h2>Reserva con {peluquero.nombre}</h2>
 
-                <div className="form-group">
-                  <label>Horarios disponibles:</label>
-                  <div className="horarios-grid">
-                    {Object.keys(availableHours).length > 0 ? (
-                      Object.keys(availableHours).map((hora) => (
-                        <div key={hora} className={`hora-slot ${availableHours[hora]}`}>
-                          <input
-                            type="radio"
-                            name="hora"
-                            id={`hora-${hora}`}
-                            value={hora}
-                            checked={formData.hora === hora}
-                            onChange={handleHourChange}
-                            disabled={availableHours[hora] !== 'disponible'}
-                          />
-                          <label htmlFor={`hora-${hora}`} style={{ width: '100%', height: '100%', display: 'block', cursor: 'pointer' }}>{hora}</label>
-                        </div>
-                      ))
-                    ) : (
-                      <p style={{ color: '#888', fontStyle: 'italic' }}>Selecciona una fecha para ver horarios.</p>
-                    )}
+              <form onSubmit={handleSubmit} className="reserva-form">
+                {currentStep === 1 && (
+                  <div className="form-step active">
+                    <div className="form-group">
+                      <label>Fecha:</label>
+                      <input
+                        type="date"
+                        className="datepicker"
+                        value={formData.fecha}
+                        onChange={handleDateChange}
+                        min={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Horarios disponibles:</label>
+                      <div className="horarios-grid">
+                        {Object.keys(availableHours).length > 0 ? (
+                          Object.keys(availableHours).map((hora) => (
+                            <div key={hora} className={`hora-slot ${availableHours[hora]}`}>
+                              <input
+                                type="radio"
+                                name="hora"
+                                id={`hora-${hora}`}
+                                value={hora}
+                                checked={formData.hora === hora}
+                                onChange={handleHourChange}
+                                disabled={availableHours[hora] !== 'disponible'}
+                              />
+                              <label htmlFor={`hora-${hora}`}>{hora}</label>
+                            </div>
+                          ))
+                        ) : (
+                          <p>No hay horas para esta fecha. Selecciona otro día.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Servicio:</label>
+                      <select
+                        value={formData.servicio}
+                        name="servicio"
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Seleccionar servicio</option>
+                        {peluquero.servicios.map((s) => (
+                          <option key={s} value={s}>
+                            {s} - ${peluquero.precios[s]}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="form-navigation">
+                      <button type="button" onClick={handleNextStep} className="btn-next">
+                        Siguiente
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="form-group">
-                  <label>Servicio:</label>
-                  <select
-                    value={formData.servicio}
-                    name="servicio"
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">Seleccionar servicio</option>
-                    {peluquero.servicios.map((s) => (
-                      <option key={s} value={s}>
-                        {s} - ${peluquero.precios[s]}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {currentStep === 2 && (
+                  <div className="form-step active">
+                    <div className="form-group">
+                      <label>Nombre*</label>
+                      <input name="nombre" value={formData.nombre} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Apellido*</label>
+                      <input name="apellido" value={formData.apellido} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Email*</label>
+                      <input name="email" type="email" value={formData.email} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Teléfono*</label>
+                      <input name="telefono" value={formData.telefono} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>RUT (Opcional)</label>
+                      <input name="rut" value={formData.rut} onChange={handleChange} />
+                    </div>
 
-                <div className="form-navigation">
-                  <button type="button" onClick={handleNextStep} className="btn-next">
-                    Siguiente
-                  </button>
-                </div>
-              </div>
-            )}
+                    <div className="form-navigation">
+                      <button type="button" onClick={handlePrevStep} className="btn-prev">
+                        Anterior
+                      </button>
+                      <button type="submit" className="btn-confirmar">
+                        Agendar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </form>
+            </>
+          )}
+        </div>
 
-            {currentStep === 2 && (
-              <div className="form-step active">
-                <div className="form-group">
-                  <label>Nombre*</label>
-                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
-                </div>
-                <div className="form-group">
-                  <label>Apellido*</label>
-                  <input type="text" name="apellido" value={formData.apellido} onChange={handleChange} required />
-                </div>
-                <div className="form-group">
-                  <label>Email*</label>
-                  <input type="email" name="email" value={formData.email} onChange={handleChange} required />
-                </div>
-                <div className="form-group">
-                  <label>Teléfono*</label>
-                  <input type="text" name="telefono" value={formData.telefono} onChange={handleChange} required />
-                </div>
-                <div className="form-group">
-                  <label>RUT (Opcional)</label>
-                  <input type="text" name="rut" value={formData.rut} onChange={handleChange} />
-                </div>
+        {/* RESUMEN DE LA RESERVA */}
+        <aside className="reserva-summary">
+          <h4>Resumen de tu Reserva</h4>
+          <div className="summary-content">
+            <div className="summary-item">
+              <strong>Barbero:</strong>
+              <span>{peluquero?.nombre || '---'}</span>
+            </div>
+            <div className="summary-item">
+              <strong>Fecha:</strong>
+              <span>{formData.fecha || '---'}</span>
+            </div>
+            <div className="summary-item">
+              <strong>Hora:</strong>
+              <span>{formData.hora || '---'}</span>
+            </div>
+            <div className="summary-item">
+              <strong>Servicio:</strong>
+              <span>{formData.servicio || '---'}</span>
+            </div>
+            <div className="summary-item">
+              <strong>Cliente:</strong>
+              <span>{formData.nombre || '---'}</span>
+            </div>
+          </div>
+        </aside>
 
-                <div className="form-navigation">
-                  <button type="button" onClick={handlePrevStep} className="btn-prev">
-                    Anterior
-                  </button>
-                  <button type="submit" className="btn-confirmar">
-                    Agendar
-                  </button>
-                </div>
-              </div>
-            )}
-          </form>
-        </>
-      )}
-    </section>
+      </section>
+    </>
   );
 }
