@@ -27,57 +27,34 @@ export default function Reserva() {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'https://barberia-proyecto-back-production-f876.up.railway.app';
 
+  // --- EFECTOS DE CARGA (Sin cambios en lógica) ---
   useEffect(() => {
     if (!slug) return;
-
     const cargarBarbero = async () => {
       try {
-        const resBarberos = await fetch(`${backendUrl}/barberos/`);
-        const todos = await resBarberos.json();
+        const res = await fetch(`${backendUrl}/barberos/`);
+        const todos = await res.json();
+        const crearSlug = (n) => n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
-        const crearSlug = (nombre) =>
-          nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, '-')
-            .replace(/[^a-z0-9-]/g, '');
+        const encontrado = todos.find(b => crearSlug(b.nombre) === slug.toLowerCase());
+        if (!encontrado) { setError('Barbero no encontrado.'); return; }
 
-        const barberoEncontrado = todos.find(
-          (b) => crearSlug(b.nombre) === slug.toLowerCase()
-        );
-
-        if (!barberoEncontrado) {
-          setError('Barbero no encontrado.');
-          return;
-        }
-
-        const resHorarios = await fetch(
-          `${backendUrl}/barberos/${barberoEncontrado._id}/disponibilidades`
-        );
+        const resHorarios = await fetch(`${backendUrl}/barberos/${encontrado._id}/disponibilidades`);
         const dataHorarios = await resHorarios.json();
-
         const formateado = {};
-        dataHorarios.forEach((slot) => {
-          if (!formateado[slot.fecha]) formateado[slot.fecha] = {};
-          formateado[slot.fecha][slot.hora] = slot.estado;
+        dataHorarios.forEach((s) => {
+          if (!formateado[s.fecha]) formateado[s.fecha] = {};
+          formateado[s.fecha][s.hora] = s.estado;
         });
 
         setPeluquero({
-          ...barberoEncontrado,
+          ...encontrado,
           horarios: formateado,
           servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
-          precios: {
-            'Corte básico': 15000,
-            'Corte premium': 20000,
-            Tintura: 25000,
-            Lavado: 5000,
-            Peinado: 10000,
-          },
+          precios: { 'Corte básico': 15000, 'Corte premium': 20000, 'Tintura': 25000, 'Lavado': 5000, 'Peinado': 10000 },
         });
-      } catch (err) {
-        console.error('Error al cargar barbero:', err);
-        setError('Error al cargar datos del barbero.');
-      }
+      } catch (err) { setError('Error al cargar datos.'); }
     };
-
     cargarBarbero();
   }, [slug, backendUrl]);
 
@@ -87,52 +64,44 @@ export default function Reserva() {
     } else {
       setAvailableHours({});
     }
-    setFormData((prev) => ({ ...prev, hora: '' }));
+    setFormData(p => ({ ...p, hora: '' }));
   }, [selectedDate, peluquero]);
 
+  // --- HANDLERS ---
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
     setError('');
   };
 
   const handleDateChange = (e) => {
-    const newDate = e.target.value;
-    setSelectedDate(newDate);
-    setFormData((prev) => ({ ...prev, fecha: newDate }));
+    setSelectedDate(e.target.value);
+    setFormData(prev => ({ ...prev, fecha: e.target.value }));
     setError('');
   };
 
   const handleHourChange = (e) => {
-    setFormData((prev) => ({ ...prev, hora: e.target.value }));
+    setFormData(prev => ({ ...prev, hora: e.target.value }));
     setError('');
   };
 
   const handleNextStep = () => {
     setError('');
     if (currentStep === 1) {
-      if (!formData.fecha) return setError('Por favor, seleccione una fecha.');
-      if (!formData.hora) return setError('Por favor, seleccione un horario.');
-      if (!formData.servicio) return setError('Por favor, seleccione un servicio.');
+      if (!formData.fecha) return setError('Selecciona una fecha.');
+      if (!formData.hora) return setError('Selecciona un horario.');
+      if (!formData.servicio) return setError('Selecciona un servicio.');
     }
-    setCurrentStep((prev) => prev + 1);
-    window.scrollTo(0, 0);
-  };
-
-  const handlePrevStep = () => {
-    setCurrentStep((prev) => prev - 1);
-    setError('');
+    setCurrentStep(prev => prev + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-
     if (!formData.nombre || !formData.apellido || !formData.email || !formData.telefono) {
-      setError('Por favor, completa todos los campos obligatorios (*).');
+      setError('Completa los campos obligatorios (*).');
       return;
     }
-
     const datosReserva = {
       id_barbero: peluquero._id,
       fecha: formData.fecha,
@@ -151,11 +120,8 @@ export default function Reserva() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datosReserva),
       });
-
       const resultado = await res.json();
-      if (!res.ok) {
-        throw new Error(resultado.detail || 'Error al guardar la reserva');
-      }
+      if (!res.ok) throw new Error(resultado.detail || 'Error');
 
       router.push({
         pathname: '/confirmacion',
@@ -173,244 +139,191 @@ export default function Reserva() {
         },
       });
     } catch (err) {
-      console.error('Error al procesar la reserva:', err);
-      setError(`Hubo un problema al agendar tu reserva: ${err.message}`);
+      setError('Error al agendar reserva.');
     }
   };
 
-  if (!peluquero && !error) {
-    return (
-      <div className="reserva-container loading-container" style={{ textAlign: 'center', marginTop: '50px', display: 'block' }}>
-        <h3>Cargando información del profesional...</h3>
-      </div>
-    );
-  }
+  if (!peluquero) return <div style={{ padding: '50px', textAlign: 'center' }}>Cargando...</div>;
 
   return (
     <>
-      <Head>
-        <title>Reserva | Valiant Barbería</title>
-      </Head>
+      <Head><title>Agendar Cita | Valiant</title></Head>
 
-      <div style={{ background: '#f8f8f8', minHeight: '100vh', padding: '2rem 1rem' }}>
+      <div className="page-wrapper">
 
         {/* Encabezado */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '3rem', margin: 0 }}>AGENDAR CITA</h2>
-          {peluquero && <p style={{ color: '#666' }}>Reserva tu experiencia con <strong style={{ color: 'var(--color-secondary)' }}>{peluquero.nombre}</strong></p>}
-        </div>
+        <header className="main-header">
+          <h2>AGENDAR CITA</h2>
+          <p>Reserva tu experiencia con <strong style={{ color: 'var(--color-secondary)' }}>{peluquero.nombre}</strong></p>
+        </header>
 
-        {/* Contenedor Principal Flex */}
-        <section className="reserva-container">
+        <div className="reserva-layout">
 
-          <div className="reserva-content-wrapper">
+          {/* COLUMNA IZQUIERDA: FORMULARIO */}
+          <section className="form-container">
 
             {/* Stepper */}
-            <div className="reserva-steps">
+            <div className="stepper">
               <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>
-                <div className="step-number">{currentStep > 1 ? <i className="fas fa-check"></i> : '1'}</div>
-                <div className="step-label">Selección</div>
+                <div className="step-circle">{currentStep > 1 ? '✓' : '1'}</div>
+                <div className="step-title">Selección</div>
               </div>
-              <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>
-                <div className="step-number">2</div>
-                <div className="step-label">Tus Datos</div>
+              <div className={`step ${currentStep === 2 ? 'active' : ''}`}>
+                <div className="step-circle">2</div>
+                <div className="step-title">Tus Datos</div>
               </div>
             </div>
 
-            {error && (
-              <div className="error-message">
-                <i className="fas fa-exclamation-circle"></i>
-                <span>{error}</span>
-              </div>
-            )}
+            {error && <div style={{ background: '#ffebee', color: '#c62828', padding: '10px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.9rem' }}><i className="fas fa-exclamation-circle"></i> {error}</div>}
 
-            {peluquero && (
-              <form onSubmit={handleSubmit} className="reserva-form">
+            <form onSubmit={handleSubmit}>
 
-                {/* PASO 1: SELECCIÓN */}
-                {currentStep === 1 && (
-                  <div className="form-step active">
+              {/* PASO 1 */}
+              {currentStep === 1 && (
+                <div className="step-content animate-fade">
 
-                    {/* Fecha - Estilo "Calendario Anterior" Compacto */}
-                    <div className="form-group">
-                      <label className="input-label" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                        <i className="far fa-calendar-alt"></i> ¿Qué día prefieres?
-                      </label>
+                  {/* Fecha Compacta */}
+                  <div className="input-group">
+                    <label className="label-title"><i className="far fa-calendar-alt"></i> ¿Qué día prefieres?</label>
+                    <div className="date-picker-wrapper">
                       <input
                         type="date"
-                        className="datepicker-compact"
-                        value={formData.fecha}
+                        className="modern-input"
                         onChange={handleDateChange}
+                        value={formData.fecha}
                         min={new Date().toISOString().split('T')[0]}
                       />
                     </div>
+                  </div>
 
-                    {/* Horarios Grid */}
-                    <div className="form-group" style={{ marginTop: '25px' }}>
-                      <label className="input-label" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                        <i className="far fa-clock"></i> Horarios Disponibles
-                      </label>
+                  {/* Horarios Grid */}
+                  <div className="input-group">
+                    <label className="label-title"><i className="far fa-clock"></i> Horarios Disponibles</label>
+                    {!selectedDate ? (
+                      <p style={{ color: '#999', fontStyle: 'italic', fontSize: '0.9rem' }}>Selecciona una fecha primero.</p>
+                    ) : (
+                      <div className="hours-grid">
+                        {Object.keys(availableHours).length > 0 ? (
+                          Object.keys(availableHours).map(h => (
+                            <label key={h} className="hour-btn">
+                              <input
+                                type="radio"
+                                name="hora"
+                                value={h}
+                                onChange={handleHourChange}
+                                checked={formData.hora === h}
+                                disabled={availableHours[h] !== 'disponible'}
+                              />
+                              <span className="hour-label">{h}</span>
+                            </label>
+                          ))
+                        ) : <p style={{ fontSize: '0.9rem' }}>No hay horas disponibles.</p>}
+                      </div>
+                    )}
+                  </div>
 
-                      {!selectedDate ? (
-                        <div style={{ padding: '15px', background: '#f5f5f5', borderRadius: '6px', color: '#666', fontSize: '0.9rem' }}>
-                          Selecciona una fecha para ver los horarios.
-                        </div>
-                      ) : (
-                        <div className="horarios-grid">
-                          {Object.keys(availableHours).length > 0 ? (
-                            Object.keys(availableHours).map((hora) => (
-                              <div key={hora} className={`hora-slot ${availableHours[hora]}`}>
-                                <input
-                                  type="radio"
-                                  name="hora"
-                                  id={`hora-${hora}`}
-                                  value={hora}
-                                  checked={formData.hora === hora}
-                                  onChange={handleHourChange}
-                                  disabled={availableHours[hora] !== 'disponible'}
-                                />
-                                <label htmlFor={`hora-${hora}`}>{hora}</label>
-                              </div>
-                            ))
-                          ) : (
-                            <p className="no-hours">No hay horas disponibles.</p>
-                          )}
-                        </div>
-                      )}
+                  {/* Servicio */}
+                  <div className="input-group">
+                    <label className="label-title"><i className="fas fa-cut"></i> Selecciona el Servicio</label>
+                    <select className="modern-select" name="servicio" value={formData.servicio} onChange={handleChange}>
+                      <option value="">-- Seleccionar --</option>
+                      {peluquero.servicios.map(s => (
+                        <option key={s} value={s}>{s} — ${peluquero.precios[s]?.toLocaleString('es-CL')}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="actions" style={{ justifyContent: 'flex-end' }}>
+                    <button type="button" className="btn-primary" onClick={handleNextStep}>
+                      Siguiente Paso <i className="fas fa-arrow-right"></i>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* PASO 2 */}
+              {currentStep === 2 && (
+                <div className="step-content animate-fade">
+                  <h3 style={{ marginBottom: '1.5rem', color: 'var(--color-primary)' }}>Información de Contacto</h3>
+
+                  <div className="form-grid-2">
+                    <div className="input-group">
+                      <label className="label-title">Nombre *</label>
+                      <input className="modern-input" name="nombre" placeholder="Ej: Juan" onChange={handleChange} value={formData.nombre} />
                     </div>
-
-                    {/* Servicio */}
-                    <div className="form-group" style={{ marginTop: '25px' }}>
-                      <label className="input-label" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                        <i className="fas fa-cut"></i> Selecciona el Servicio
-                      </label>
-                      <select
-                        value={formData.servicio}
-                        name="servicio"
-                        onChange={handleChange}
-                        required
-                        className="modern-select"
-                      >
-                        <option value="">-- Seleccionar --</option>
-                        {peluquero.servicios.map((s) => (
-                          <option key={s} value={s}>
-                            {s} — {peluquero.precios[s] ? `$${peluquero.precios[s].toLocaleString('es-CL')}` : 'Consultar'}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="form-navigation" style={{ marginTop: '30px' }}>
-                      <button type="button" onClick={handleNextStep} className="btn-confirmar" style={{ width: 'auto' }}>
-                        Siguiente Paso <i className="fas fa-arrow-right" style={{ marginLeft: '8px' }}></i>
-                      </button>
+                    <div className="input-group">
+                      <label className="label-title">Apellido *</label>
+                      <input className="modern-input" name="apellido" placeholder="Ej: Pérez" onChange={handleChange} value={formData.apellido} />
                     </div>
                   </div>
-                )}
 
-                {/* PASO 2: DATOS DEL CLIENTE */}
-                {currentStep === 2 && (
-                  <div className="form-step active">
-                    <h3 className="subtitulo" style={{ fontFamily: 'Bebas Neue', fontSize: '1.5rem', marginBottom: '25px' }}>INFORMACIÓN DE CONTACTO</h3>
+                  <div className="input-group">
+                    <label className="label-title">Correo Electrónico *</label>
+                    <input className="modern-input" type="email" name="email" placeholder="nombre@correo.com" onChange={handleChange} value={formData.email} />
+                  </div>
 
-                    {/* Grid Layout: Nombre | Apellido */}
-                    <div className="form-grid-row">
-                      <div className="form-group">
-                        <label className="input-label">Nombre *</label>
-                        <div className="input-icon-wrapper">
-                          <i className="fas fa-user input-icon"></i>
-                          <input name="nombre" className="modern-input input-with-icon" value={formData.nombre} onChange={handleChange} required placeholder="Ej: Juan" />
-                        </div>
-                      </div>
-                      <div className="form-group">
-                        <label className="input-label">Apellido *</label>
-                        <div className="input-icon-wrapper">
-                          <i className="fas fa-user input-icon"></i>
-                          <input name="apellido" className="modern-input input-with-icon" value={formData.apellido} onChange={handleChange} required placeholder="Ej: Pérez" />
-                        </div>
-                      </div>
+                  <div className="form-grid-2">
+                    <div className="input-group">
+                      <label className="label-title">Teléfono *</label>
+                      <input className="modern-input" name="telefono" placeholder="+56 9..." onChange={handleChange} value={formData.telefono} />
                     </div>
-
-                    {/* Fila Completa: Email */}
-                    <div className="form-group" style={{ marginBottom: '20px' }}>
-                      <label className="input-label">Correo Electrónico *</label>
-                      <div className="input-icon-wrapper">
-                        <i className="fas fa-envelope input-icon"></i>
-                        <input name="email" type="email" className="modern-input input-with-icon" value={formData.email} onChange={handleChange} required placeholder="nombre@correo.com" />
-                      </div>
-                    </div>
-
-                    {/* Grid Layout: Teléfono | RUT */}
-                    <div className="form-grid-row">
-                      <div className="form-group">
-                        <label className="input-label">Teléfono *</label>
-                        <div className="input-icon-wrapper">
-                          <i className="fas fa-phone input-icon"></i>
-                          <input name="telefono" className="modern-input input-with-icon" value={formData.telefono} onChange={handleChange} required placeholder="+56 9..." />
-                        </div>
-                      </div>
-                      <div className="form-group">
-                        <label className="input-label">RUT (Opcional)</label>
-                        <div className="input-icon-wrapper">
-                          <i className="fas fa-id-card input-icon"></i>
-                          <input name="rut" className="modern-input input-with-icon" value={formData.rut} onChange={handleChange} placeholder="12.345.678-9" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="form-navigation" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px' }}>
-                      <button type="button" onClick={handlePrevStep} className="btn-prev">
-                        <i className="fas fa-arrow-left" style={{ marginRight: '8px' }}></i> Volver
-                      </button>
-                      <button type="submit" className="btn-confirmar">
-                        Confirmar Cita <i className="fas fa-check-circle" style={{ marginLeft: '8px' }}></i>
-                      </button>
+                    <div className="input-group">
+                      <label className="label-title">RUT (Opcional)</label>
+                      <input className="modern-input" name="rut" placeholder="12.345.678-9" onChange={handleChange} value={formData.rut} />
                     </div>
                   </div>
-                )}
-              </form>
-            )}
-          </div>
 
-          {/* RESUMEN LATERAL */}
-          <aside className="reserva-summary">
-            <h4><i className="fas fa-receipt"></i> Tu Resumen</h4>
+                  <div className="actions">
+                    <button type="button" className="btn-outline" onClick={() => setCurrentStep(1)}>
+                      <i className="fas fa-arrow-left"></i> Volver
+                    </button>
+                    <button type="submit" className="btn-primary">
+                      Confirmar Cita <i className="fas fa-check-circle"></i>
+                    </button>
+                  </div>
+                </div>
+              )}
 
-            <div className="summary-row">
-              <span>Barbero:</span>
-              <strong>{peluquero?.nombre || 'Seleccionando...'}</strong>
-            </div>
-            <div className="summary-row">
-              <span>Fecha:</span>
-              <strong>{formData.fecha ? new Date(formData.fecha).toLocaleDateString() : '--/--/--'}</strong>
-            </div>
-            <div className="summary-row">
-              <span>Hora:</span>
-              <strong>{formData.hora || '--:--'}</strong>
-            </div>
+            </form>
+          </section>
 
-            <div style={{ margin: '15px 0', borderBottom: '1px solid #eee' }}></div>
-
-            <div className="summary-row">
-              <span>Servicio:</span>
-              <span style={{ textAlign: 'right', maxWidth: '150px' }}>{formData.servicio || '---'}</span>
-            </div>
-
-            {peluquero?.precios[formData.servicio] && (
-              <div className="summary-row total">
-                <span>TOTAL A PAGAR</span>
-                <span>${peluquero.precios[formData.servicio].toLocaleString('es-CL')}</span>
+          {/* RESUMEN */}
+          <aside className="summary-container">
+            <div className="ticket">
+              <div className="ticket-header">
+                <h4><i className="fas fa-receipt"></i> TU RESUMEN</h4>
               </div>
-            )}
 
-            {!peluquero?.precios[formData.servicio] && (
-              <p style={{ fontSize: '0.8rem', color: '#999', marginTop: '20px', textAlign: 'center' }}>
-                * El precio final se confirmará en el local.
-              </p>
-            )}
+              <div className="ticket-content">
+                <div className="ticket-row">
+                  <span>Barbero:</span>
+                  <strong>{peluquero.nombre}</strong>
+                </div>
+                <div className="ticket-row">
+                  <span>Fecha:</span>
+                  <strong>{formData.fecha || '--/--/--'}</strong>
+                </div>
+                <div className="ticket-row">
+                  <span>Hora:</span>
+                  <strong>{formData.hora || '--:--'}</strong>
+                </div>
+
+                <div style={{ margin: '1rem 0', borderBottom: '1px solid #eee' }}></div>
+
+                <div className="ticket-row">
+                  <span>Servicio:</span>
+                  <span style={{ textAlign: 'right', maxWidth: '120px' }}>{formData.servicio || '---'}</span>
+                </div>
+
+                <div className="ticket-total">
+                  <span>TOTAL</span>
+                  <span>${peluquero.precios[formData.servicio] ? peluquero.precios[formData.servicio].toLocaleString('es-CL') : '0'}</span>
+                </div>
+              </div>
+            </div>
           </aside>
 
-        </section>
+        </div>
       </div>
     </>
   );
