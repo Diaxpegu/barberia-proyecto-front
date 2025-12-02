@@ -8,11 +8,8 @@ export default function BarberosAdmin() {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     "https://barberia-proyecto-back-production-f876.up.railway.app";
 
-  // Estados de Modales
   const [showModalAgregar, setShowModalAgregar] = useState(false);
   const [showModalEliminar, setShowModalEliminar] = useState(false);
-
-  // Estado para el Modal de Éxito
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -51,7 +48,6 @@ export default function BarberosAdmin() {
     cargar();
   }, []);
 
-  // Función auxiliar para mostrar éxito
   const triggerSuccess = (msg) => {
     setSuccessMessage(msg);
     setShowSuccess(true);
@@ -80,7 +76,6 @@ export default function BarberosAdmin() {
       const out = await res.json();
       if (!res.ok) return alert(out.detail || "Error al crear");
 
-      // Cerrar modal de formulario y mostrar éxito
       setShowModalAgregar(false);
       setNuevoBarbero({ nombre: "", usuario: "", contrasena: "", especialidad: "" });
       cargar();
@@ -99,7 +94,6 @@ export default function BarberosAdmin() {
       const out = await res.json();
       if (!res.ok) return alert(out.detail || "Error al eliminar");
 
-      // Cerrar modal de formulario y mostrar éxito
       setShowModalEliminar(false);
       setIdEliminar("");
       cargar();
@@ -113,7 +107,6 @@ export default function BarberosAdmin() {
     <DashboardLayoutAdmin usuario="Administrador">
       <div className="admin-header">
         <h2>Gestión de Barberos</h2>
-
         <div className="admin-toolbar">
           <button className="btn-admin-action btn-verde" onClick={() => setShowModalAgregar(true)}>
             <i className="fas fa-plus"></i> Agregar Barbero
@@ -129,7 +122,6 @@ export default function BarberosAdmin() {
         data={rows}
       />
 
-      {/* MODAL AGREGAR */}
       {showModalAgregar && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -160,12 +152,10 @@ export default function BarberosAdmin() {
         </div>
       )}
 
-      {/* MODAL ELIMINAR */}
       {showModalEliminar && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Eliminar Barbero</h3>
-            <p>Por favor, ingresa el ID del barbero que deseas eliminar (puedes copiarlo de la tabla).</p>
             <form onSubmit={confirmarEliminar}>
               <div className="form-group">
                 <label>ID del Barbero:</label>
@@ -173,23 +163,20 @@ export default function BarberosAdmin() {
               </div>
               <div className="modal-actions">
                 <button type="button" className="btn-admin-action btn-gris" onClick={() => setShowModalEliminar(false)}>Cancelar</button>
-                <button type="submit" className="btn-admin-action btn-rojo">Eliminar Definitivamente</button>
+                <button type="submit" className="btn-admin-action btn-rojo">Eliminar</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* MODAL DE ÉXITO SUPERPUESTO */}
       {showSuccess && (
         <div className="modal-overlay">
           <div className="modal-content success-modal-content">
             <i className="fas fa-check-circle success-icon"></i>
-            <h3 className="success-title">¡Operación Exitosa!</h3>
+            <h3 className="success-title">¡Éxito!</h3>
             <p>{successMessage}</p>
-            <button className="success-btn-close" onClick={() => setShowSuccess(false)}>
-              Cerrar
-            </button>
+            <button className="success-btn-close" onClick={() => setShowSuccess(false)}>Cerrar</button>
           </div>
         </div>
       )}

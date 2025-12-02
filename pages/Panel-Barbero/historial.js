@@ -23,7 +23,17 @@ export default function HistorialBarbero() {
       try {
         const res = await fetch(`${backendUrl}/barbero/historial/${id}`);
         const data = await res.json();
-        setHistorial(data);
+
+        const formateado = Array.isArray(data) ? data.map(r => ({
+          _id: r._id,
+          fecha: r.fecha,
+          hora: r.hora,
+          cliente: r.cliente?.[0]?.nombre || "Desconocido",
+          servicio: r.servicio?.[0]?.nombre_servicio || "Servicio",
+          estado: r.estado
+        })) : [];
+
+        setHistorial(formateado);
       } catch (err) {
         console.error("Error al cargar historial:", err);
       }
@@ -31,13 +41,15 @@ export default function HistorialBarbero() {
     cargarHistorial();
   }, [backendUrl]);
 
-  const columnas = ["fecha", "hora", "id_cliente", "id_servicio", "estado"];
-
   return (
     <DashboardLayoutBarbero usuario={barbero?.usuario}>
-      <h2>Historial de Citas Completadas</h2>
-      <p>Visualiza tus citas atendidas anteriormente.</p>
-      <DataTable data={historial} columnas={columnas} />
+      <h2>Historial de Citas Atendidas</h2>
+      <p>Clientes atendidos (Estado: Listo).</p>
+
+      <DataTable
+        data={historial}
+        columnas={["fecha", "hora", "cliente", "servicio", "estado"]}
+      />
     </DashboardLayoutBarbero>
   );
 }
