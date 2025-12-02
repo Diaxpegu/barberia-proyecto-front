@@ -27,7 +27,6 @@ export default function Reserva() {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'https://barberia-proyecto-back-production-f876.up.railway.app';
 
-  // Cargar datos del barbero
   useEffect(() => {
     if (!slug) return;
 
@@ -82,7 +81,6 @@ export default function Reserva() {
     cargarBarbero();
   }, [slug, backendUrl]);
 
-  // Actualizar horas
   useEffect(() => {
     if (selectedDate && peluquero && peluquero.horarios[selectedDate]) {
       setAvailableHours(peluquero.horarios[selectedDate]);
@@ -229,30 +227,33 @@ export default function Reserva() {
             {peluquero && (
               <form onSubmit={handleSubmit} className="reserva-form">
 
-                {/*  PASO 1  */}
+                {/* PASO 1: SELECCIÓN */}
                 {currentStep === 1 && (
                   <div className="form-step active">
 
-                    {/* Fecha */}
+                    {/* Fecha - Estilo "Calendario Anterior" Compacto */}
                     <div className="form-group">
-                      <label className="input-label"><i className="far fa-calendar-alt"></i> ¿Qué día prefieres?</label>
+                      <label className="input-label" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                        <i className="far fa-calendar-alt"></i> ¿Qué día prefieres?
+                      </label>
                       <input
                         type="date"
-                        className="modern-input"
+                        className="datepicker-compact"
                         value={formData.fecha}
                         onChange={handleDateChange}
                         min={new Date().toISOString().split('T')[0]}
-                        style={{ cursor: 'pointer' }}
                       />
                     </div>
 
                     {/* Horarios Grid */}
-                    <div className="form-group">
-                      <label className="input-label"><i className="far fa-clock"></i> Horarios Disponibles</label>
+                    <div className="form-group" style={{ marginTop: '25px' }}>
+                      <label className="input-label" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                        <i className="far fa-clock"></i> Horarios Disponibles
+                      </label>
 
                       {!selectedDate ? (
-                        <div style={{ padding: '20px', background: '#f0f0f0', borderRadius: '8px', textAlign: 'center', color: '#888' }}>
-                          <i className="fas fa-arrow-up"></i> Primero selecciona una fecha arriba.
+                        <div style={{ padding: '15px', background: '#f5f5f5', borderRadius: '6px', color: '#666', fontSize: '0.9rem' }}>
+                          Selecciona una fecha para ver los horarios.
                         </div>
                       ) : (
                         <div className="horarios-grid">
@@ -272,15 +273,17 @@ export default function Reserva() {
                               </div>
                             ))
                           ) : (
-                            <p className="no-hours">No hay horas disponibles para esta fecha.</p>
+                            <p className="no-hours">No hay horas disponibles.</p>
                           )}
                         </div>
                       )}
                     </div>
 
                     {/* Servicio */}
-                    <div className="form-group">
-                      <label className="input-label"><i className="fas fa-cut"></i> Selecciona el Servicio</label>
+                    <div className="form-group" style={{ marginTop: '25px' }}>
+                      <label className="input-label" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                        <i className="fas fa-cut"></i> Selecciona el Servicio
+                      </label>
                       <select
                         value={formData.servicio}
                         name="servicio"
@@ -297,20 +300,21 @@ export default function Reserva() {
                       </select>
                     </div>
 
-                    <div className="form-navigation" style={{ marginTop: '30px', textAlign: 'right' }}>
-                      <button type="button" onClick={handleNextStep} className="btn-next">
+                    <div className="form-navigation" style={{ marginTop: '30px' }}>
+                      <button type="button" onClick={handleNextStep} className="btn-confirmar" style={{ width: 'auto' }}>
                         Siguiente Paso <i className="fas fa-arrow-right" style={{ marginLeft: '8px' }}></i>
                       </button>
                     </div>
                   </div>
                 )}
 
-                {/* PASO 2 */}
+                {/* PASO 2: DATOS DEL CLIENTE */}
                 {currentStep === 2 && (
                   <div className="form-step active">
-                    <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px', color: '#333' }}>Información de Contacto</h3>
+                    <h3 className="subtitulo" style={{ fontFamily: 'Bebas Neue', fontSize: '1.5rem', marginBottom: '25px' }}>INFORMACIÓN DE CONTACTO</h3>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    {/* Grid Layout: Nombre | Apellido */}
+                    <div className="form-grid-row">
                       <div className="form-group">
                         <label className="input-label">Nombre *</label>
                         <div className="input-icon-wrapper">
@@ -327,7 +331,8 @@ export default function Reserva() {
                       </div>
                     </div>
 
-                    <div className="form-group">
+                    {/* Fila Completa: Email */}
+                    <div className="form-group" style={{ marginBottom: '20px' }}>
                       <label className="input-label">Correo Electrónico *</label>
                       <div className="input-icon-wrapper">
                         <i className="fas fa-envelope input-icon"></i>
@@ -335,7 +340,8 @@ export default function Reserva() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    {/* Grid Layout: Teléfono | RUT */}
+                    <div className="form-grid-row">
                       <div className="form-group">
                         <label className="input-label">Teléfono *</label>
                         <div className="input-icon-wrapper">
