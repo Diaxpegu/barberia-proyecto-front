@@ -23,7 +23,33 @@ export default function HistorialBarbero() {
       try {
         const res = await fetch(`${backendUrl}/barbero/historial/${id}`);
         const data = await res.json();
-        setHistorial(data);
+
+        const historialProcesado = (Array.isArray(data) ? data : []).map((item) => {
+          let nombreCliente = "Anónimo";
+          if (item.cliente && item.cliente[0] && item.cliente[0].nombre) {
+            nombreCliente = item.cliente[0].nombre;
+          } else if (item.datos_cliente_snapshot && item.datos_cliente_snapshot.nombre) {
+            nombreCliente = item.datos_cliente_snapshot.nombre;
+          }
+
+          let nombreServicio = "Servicio";
+          if (item.servicio && item.servicio[0] && item.servicio[0].nombre_servicio) {
+            nombreServicio = item.servicio[0].nombre_servicio;
+          } else if (item.servicio_nombre) {
+            nombreServicio = item.servicio_nombre;
+          }
+
+          return {
+            _id: item._id,
+            fecha: item.fecha,
+            hora: item.hora,
+            cliente: nombreCliente,
+            servicio: nombreServicio,
+            estado: item.estado
+          };
+        });
+
+        setHistorial(historialProcesado);
       } catch (err) {
         console.error("Error al cargar historial:", err);
       }
@@ -31,7 +57,7 @@ export default function HistorialBarbero() {
     cargarHistorial();
   }, [backendUrl]);
 
-  const columnas = ["fecha", "hora", "id_cliente", "id_servicio", "estado"];
+  const columnas = ["fecha", "hora", "cliente", "servicio", "estado"];
 
   return (
     <DashboardLayoutBarbero usuario={barbero?.usuario}>
