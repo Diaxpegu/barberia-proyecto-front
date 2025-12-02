@@ -18,7 +18,6 @@ export default function Reserva() {
     rut: '',
   });
 
-  // Control de pasos del formulario
   const [currentStep, setCurrentStep] = useState(1);
   const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -37,7 +36,6 @@ export default function Reserva() {
         const resBarberos = await fetch(`${backendUrl}/barberos/`);
         const todos = await resBarberos.json();
 
-        // Función para normalizar slugs
         const crearSlug = (nombre) =>
           nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             .replace(/\s+/g, '-')
@@ -52,7 +50,6 @@ export default function Reserva() {
           return;
         }
 
-        // Cargar horarios del barbero
         const resHorarios = await fetch(
           `${backendUrl}/barberos/${barberoEncontrado._id}/disponibilidades`
         );
@@ -85,14 +82,13 @@ export default function Reserva() {
     cargarBarbero();
   }, [slug, backendUrl]);
 
-  // Actualizar horas disponibles cuando cambia la fecha
+  // Actualizar horas
   useEffect(() => {
     if (selectedDate && peluquero && peluquero.horarios[selectedDate]) {
       setAvailableHours(peluquero.horarios[selectedDate]);
     } else {
       setAvailableHours({});
     }
-    // Resetear hora al cambiar fecha
     setFormData((prev) => ({ ...prev, hora: '' }));
   }, [selectedDate, peluquero]);
 
@@ -211,7 +207,7 @@ export default function Reserva() {
 
           <div className="reserva-content-wrapper">
 
-            {/* Stepper Mejorado */}
+            {/* Stepper */}
             <div className="reserva-steps">
               <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>
                 <div className="step-number">{currentStep > 1 ? <i className="fas fa-check"></i> : '1'}</div>
@@ -233,7 +229,7 @@ export default function Reserva() {
             {peluquero && (
               <form onSubmit={handleSubmit} className="reserva-form">
 
-                {/* PASO 1 */}
+                {/*  PASO 1  */}
                 {currentStep === 1 && (
                   <div className="form-step active">
 
@@ -313,7 +309,6 @@ export default function Reserva() {
                 {currentStep === 2 && (
                   <div className="form-step active">
                     <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px', color: '#333' }}>Información de Contacto</h3>
-                    <p style={{ marginBottom: '20px', color: '#777', fontSize: '0.9rem' }}>Necesitamos estos datos para enviarte la confirmación.</p>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                       <div className="form-group">
