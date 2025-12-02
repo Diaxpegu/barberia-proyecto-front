@@ -25,7 +25,6 @@ export default function DashboardLayoutBarbero({ usuario = "Barbero", children }
         <nav className="menu">
           <Link href="/Panel-Barbero">Agenda</Link>
           <Link href="/Panel-Barbero/historial">Historial</Link>
-          <Link href="/Panel-Barbero/perfil">Perfil</Link>
         </nav>
 
         <button className="btn-logout" onClick={logout}>
