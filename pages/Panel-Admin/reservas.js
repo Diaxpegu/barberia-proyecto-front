@@ -28,7 +28,9 @@ export default function ReservasAdmin() {
   }, [backendUrl]);
 
   const actualizarEstado = async (id, nuevoEstado) => {
-    if (!confirm(`¿Confirmar cambio a: ${nuevoEstado}?`)) return;
+    if (nuevoEstado !== "listo") {
+      if (!confirm(`¿Estás seguro de cambiar el estado a: ${nuevoEstado}?`)) return;
+    }
 
     try {
       const res = await fetch(`${backendUrl}/reservas/actualizar/${id}`, {
@@ -90,7 +92,7 @@ export default function ReservasAdmin() {
                         {/* Botón LISTO */}
                         <button
                           className="btn-asistio"
-                          onClick={() => actualizarEstado(reserva._id, "listo")}
+                          onClick={() => actualizarEstado(reserva._id, "completado")}
                           title="Marcar como Completado"
                         >
                           <i className="fas fa-check"></i> Listo
