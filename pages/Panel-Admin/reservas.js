@@ -11,12 +11,7 @@ export default function ReservasAdmin() {
     try {
       const r = await fetch(`${backendUrl}/reservas/detalle/`);
       const data = await r.json();
-
-      const pendientes = (Array.isArray(data) ? data : []).filter(reserva =>
-        reserva.estado === 'pendiente' || reserva.estado === 'reserva'
-      );
-
-      setReservas(pendientes);
+      setReservas(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error(e);
       setReservas([]);
@@ -28,16 +23,17 @@ export default function ReservasAdmin() {
   }, [backendUrl]);
 
   const actualizarEstado = async (id, nuevoEstado) => {
-    if (!confirm(`¿Confirmar cambio a: ${nuevoEstado}?`)) return;
+    if (!confirm(`¿Marcar reserva como "${nuevoEstado}"?`)) return;
 
     try {
-      const res = await fetch(`${backendUrl}/reservas/actualizar/${id}`, {
+      const res = await fetch(`${backendUrl}/reservas/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ estado: nuevoEstado }),
       });
 
       if (res.ok) {
+        alert("Estado actualizado correctamente");
         cargarReservas();
       } else {
         alert("Error al actualizar");
@@ -51,58 +47,71 @@ export default function ReservasAdmin() {
   return (
     <DashboardLayoutAdmin usuario="Administrador">
       <h2>Gestión de Reservas</h2>
-      <p>Clientes en espera (Estado: Reserva/Pendiente)</p>
+      <p>Control de asistencia y estados.</p>
 
       <div className="tabla-container">
         <table className="tabla-custom">
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Apellido</th>
-              <th>Correo</th>
-              <th>Teléfono</th>
+              <th>Fecha/Hora</th>
+              <th>Cliente</th>
+              <th>Barbero</th>
+              <th>Servicio</th>
+              <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {reservas.length === 0 ? (
               <tr>
-                <td colSpan="5" className="no-data">
-                  No hay reservas pendientes.
+                <td colSpan="6" className="no-data">
+                  No hay reservas registradas.
                 </td>
               </tr>
             ) : (
               reservas.map((reserva) => {
-                const c = reserva.cliente && reserva.cliente[0] ? reserva.cliente[0] : {};
-                const nombre = c.nombre || "Sin nombre";
-                const apellido = c.apellido || c.apellidos || "-";
-                const correo = c.correo || c.email || "-";
-                const telefono = c.telefono || c.celular || "-";
+                // Prevenir errores si vienen datos vacíos
+                const cliente = reserva.cliente && reserva.cliente[0]
+                  ? `${reserva.cliente[0].nombre} ${reserva.cliente[0].apellido || ''}`
+                  : "Cliente desconocido";
+
+                const barbero = reserva.barbero && reserva.barbero[0]
+                  ? reserva.barbero[0].nombre
+                  : "Sin asignar";
+
+                const servicio = reserva.servicio && reserva.servicio[0]
+                  ? reserva.servicio[0].nombre_servicio
+                  : reserva.servicio_nombre || "-";
 
                 return (
                   <tr key={reserva._id}>
-                    <td>{nombre}</td>
-                    <td>{apellido}</td>
-                    <td>{correo}</td>
-                    <td>{telefono}</td>
+                    <td>
+                      {reserva.fecha} <br />
+                      <small>{reserva.hora}</small>
+                    </td>
+                    <td>{cliente}</td>
+                    <td>{barbero}</td>
+                    <td>{servicio}</td>
+                    <td>
+                      <span className={`badge ${reserva.estado ? reserva.estado.replace(" ", "-") : "pendiente"}`}>
+                        {reserva.estado || "pendiente"}
+                      </span>
+                    </td>
                     <td>
                       <div className="acciones-btns">
-                        {/* Botón LISTO */}
                         <button
                           className="btn-asistio"
-                          onClick={() => actualizarEstado(reserva._id, "listo")}
-                          title="Marcar como Completado"
+                          onClick={() => actualizarEstado(reserva._id, "asistio")}
+                          title="Marcar como Asistió"
                         >
-                          <i className="fas fa-check"></i> Listo
+                          <i className="fas fa-check"></i> Asistió
                         </button>
-
-                        {/* Botón CANCELADO */}
                         <button
                           className="btn-no-asistio"
-                          onClick={() => actualizarEstado(reserva._id, "cancelado")}
-                          title="Cancelar Cita"
+                          onClick={() => actualizarEstado(reserva._id, "no asistio")}
+                          title="Marcar como No Asistió"
                         >
-                          <i className="fas fa-times"></i> Cancelado
+                          <i className="fas fa-times"></i> Faltó
                         </button>
                       </div>
                     </td>
