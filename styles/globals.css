@@ -1908,25 +1908,21 @@ footer {
 }
 
 
-
+/* --- VARIABLES --- */
 :root {
     --color-primary: #111111;
     --color-secondary: #D4AF37;
-    --color-bg: #f4f4f4;
+    --color-bg: #f8f8f8;
     --color-white: #ffffff;
-    --color-text: #333333;
-    --color-text-light: #666666;
     --border-radius: 12px;
-    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.08);
     --transition: all 0.3s ease;
 }
 
 body {
     font-family: 'Montserrat', sans-serif;
     background-color: var(--color-bg);
-    color: var(--color-text);
     margin: 0;
-    line-height: 1.6;
 }
 
 h1,
@@ -1935,10 +1931,9 @@ h3,
 h4 {
     font-family: 'Bebas Neue', cursive;
     letter-spacing: 1px;
-    margin: 0 0 1rem 0;
 }
 
-
+/* --- WRAPPER Y HEADER DE PÁGINA --- */
 .page-wrapper {
     min-height: 100vh;
     padding: 2rem 1rem;
@@ -1952,32 +1947,37 @@ h4 {
     margin-bottom: 3rem;
 }
 
+/* Color específico para este título */
 .main-header h2 {
     font-size: 3.5rem;
     color: var(--color-primary);
-    margin-bottom: 0.5rem;
+    margin: 0 0 0.5rem 0;
 }
 
+/* --- LAYOUT PRINCIPAL (FLEX) --- */
 .reserva-layout {
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    /* IMPORTANTE: Esto habilita el sticky en el hijo */
     gap: 2.5rem;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
     position: relative;
 }
 
+/* --- FORMULARIO (COLUMNA IZQUIERDA) --- */
 .form-container {
     flex: 1;
+    /* Toma el espacio disponible */
     background: var(--color-white);
     padding: 3rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-soft);
-    min-width: 0;
 }
 
+/* Stepper */
 .stepper {
     display: flex;
     justify-content: center;
@@ -2027,7 +2027,6 @@ h4 {
 .step.active .step-circle {
     background: var(--color-secondary);
     color: var(--color-white);
-    box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
 }
 
 .step-title {
@@ -2036,6 +2035,7 @@ h4 {
     text-transform: uppercase;
 }
 
+/* Inputs */
 .input-group {
     margin-bottom: 1.5rem;
 }
@@ -2046,7 +2046,7 @@ h4 {
     gap: 8px;
     font-weight: 700;
     color: var(--color-primary);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-size: 0.95rem;
 }
 
@@ -2054,8 +2054,8 @@ h4 {
 .modern-select {
     width: 100%;
     padding: 12px 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
     font-family: 'Montserrat', sans-serif;
     font-size: 1rem;
     transition: var(--transition);
@@ -2067,19 +2067,20 @@ h4 {
     background: #fff;
     border-color: var(--color-secondary);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
 }
 
-.date-picker-wrapper input {
-    width: auto;
-    min-width: 200px;
-    cursor: pointer;
+/* Grid de Formulario (Paso 2) */
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
+/* Grid de Horarios */
 .hours-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 12px;
 }
 
 .hour-btn {
@@ -2094,9 +2095,10 @@ h4 {
 
 .hour-label {
     display: block;
-    padding: 10px 5px;
+    padding: 12px 5px;
     text-align: center;
-    background: #f0f0f0;
+    background: #eefcf3;
+    /* Verde muy suave */
     border-radius: 8px;
     font-size: 0.9rem;
     font-weight: 500;
@@ -2105,32 +2107,23 @@ h4 {
     border: 1px solid transparent;
 }
 
+/* ESTADO SELECCIONADO (Negro con borde dorado) */
 .hour-btn input:checked+.hour-label {
     background: var(--color-primary);
     color: var(--color-secondary);
     font-weight: 700;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--color-secondary);
+    /* Borde dorado sutil */
 }
 
 .hour-btn input:disabled+.hour-label {
-    opacity: 0.4;
+    opacity: 0.5;
     cursor: not-allowed;
-    text-decoration: line-through;
+    background: #f0f0f0;
 }
 
-.hour-label:hover:not(:disabled) {
-    background: #e0e0e0;
-}
-
-/* Formulario Datos  */
-.form-grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-/* Botones de Navegación */
+/* Botones Navegación */
 .actions {
     display: flex;
     justify-content: space-between;
@@ -2144,7 +2137,7 @@ h4 {
     color: var(--color-primary);
     border: none;
     padding: 12px 30px;
-    border-radius: 30px;
+    border-radius: 6px;
     font-weight: 700;
     cursor: pointer;
     transition: var(--transition);
@@ -2156,34 +2149,30 @@ h4 {
 .btn-primary:hover {
     background: #bfa345;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.25);
 }
 
 .btn-outline {
-    background: transparent;
+    background: white;
     border: 1px solid #ddd;
-    color: #666;
-    padding: 12px 25px;
-    border-radius: 30px;
-    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: var(--transition);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 5px;
 }
 
-.btn-outline:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-}
-
+/* --- RESUMEN FLOTANTE (STICKY) --- */
 .summary-container {
-    width: 350px;
+    width: 320px;
     flex-shrink: 0;
+    /* Evita que se encoja */
+
+    /* Configuración Sticky */
     position: -webkit-sticky;
     position: sticky;
     top: 2rem;
+    /* Distancia del borde superior al hacer scroll */
     z-index: 10;
 }
 
@@ -2197,7 +2186,7 @@ h4 {
     overflow: hidden;
 }
 
-/* Borde dorado superior */
+/* Línea dorada superior */
 .ticket::before {
     content: '';
     position: absolute;
@@ -2244,7 +2233,7 @@ h4 {
     color: var(--color-primary);
 }
 
-/* --- RESPONSIVE --- */
+/* Responsive */
 @media (max-width: 968px) {
     .reserva-layout {
         flex-direction: column;
@@ -2253,14 +2242,9 @@ h4 {
     .summary-container {
         width: 100%;
         position: static;
-        order: -1;
     }
 
     .form-grid-2 {
         grid-template-columns: 1fr;
-    }
-
-    .main-header h2 {
-        font-size: 2.5rem;
     }
 }

@@ -27,7 +27,7 @@ export default function Reserva() {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'https://barberia-proyecto-back-production-f876.up.railway.app';
 
-  // --- EFECTOS DE CARGA (Sin cambios en lógica) ---
+  // --- Carga de datos ---
   useEffect(() => {
     if (!slug) return;
     const cargarBarbero = async () => {
@@ -67,7 +67,7 @@ export default function Reserva() {
     setFormData(p => ({ ...p, hora: '' }));
   }, [selectedDate, peluquero]);
 
-  // --- HANDLERS ---
+  //  Handlers 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -96,12 +96,18 @@ export default function Reserva() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handlePrevStep = () => {
+    setCurrentStep(prev => prev - 1);
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.nombre || !formData.apellido || !formData.email || !formData.telefono) {
       setError('Completa los campos obligatorios (*).');
       return;
     }
+
     const datosReserva = {
       id_barbero: peluquero._id,
       fecha: formData.fecha,
@@ -151,15 +157,12 @@ export default function Reserva() {
 
       <div className="page-wrapper">
 
-        {/* Encabezado */}
-        <header className="main-header">
+        <div className="main-header">
           <h2>AGENDAR CITA</h2>
           <p>Reserva tu experiencia con <strong style={{ color: 'var(--color-secondary)' }}>{peluquero.nombre}</strong></p>
-        </header>
+        </div>
 
         <div className="reserva-layout">
-
-          {/* COLUMNA IZQUIERDA: FORMULARIO */}
           <section className="form-container">
 
             {/* Stepper */}
@@ -192,6 +195,7 @@ export default function Reserva() {
                         onChange={handleDateChange}
                         value={formData.fecha}
                         min={new Date().toISOString().split('T')[0]}
+                        style={{ width: 'auto', minWidth: '200px', cursor: 'pointer' }}
                       />
                     </div>
                   </div>
@@ -244,7 +248,7 @@ export default function Reserva() {
               {/* PASO 2 */}
               {currentStep === 2 && (
                 <div className="step-content animate-fade">
-                  <h3 style={{ marginBottom: '1.5rem', color: 'var(--color-primary)' }}>Información de Contacto</h3>
+                  <h3 style={{ marginBottom: '1.5rem', color: 'var(--color-primary)', fontFamily: 'Bebas Neue' }}>INFORMACIÓN DE CONTACTO</h3>
 
                   <div className="form-grid-2">
                     <div className="input-group">
@@ -274,7 +278,7 @@ export default function Reserva() {
                   </div>
 
                   <div className="actions">
-                    <button type="button" className="btn-outline" onClick={() => setCurrentStep(1)}>
+                    <button type="button" className="btn-outline" onClick={handlePrevStep}>
                       <i className="fas fa-arrow-left"></i> Volver
                     </button>
                     <button type="submit" className="btn-primary">
@@ -287,7 +291,7 @@ export default function Reserva() {
             </form>
           </section>
 
-          {/* RESUMEN */}
+          {/* COLUMNA DERECHA: RESUMEN */}
           <aside className="summary-container">
             <div className="ticket">
               <div className="ticket-header">
