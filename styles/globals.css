@@ -1906,3 +1906,260 @@ footer {
     color: #1e293b;
     font-family: 'Bebas Neue', sans-serif;
 }
+
+/* Contenedor Principal con efecto de profundidad */
+.reserva-container {
+    background: #ffffff;
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    max-width: 1100px;
+    margin: 2rem auto;
+    position: relative;
+    display: flex;
+    gap: 2rem;
+}
+
+.reserva-content-wrapper {
+    flex: 1;
+    /* Ocupa el espacio principal */
+}
+
+/* Títulos */
+.reserva-header h2 {
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+
+.reserva-header p {
+    font-size: 1.1rem;
+    color: var(--color-gray);
+    font-weight: 500;
+}
+
+/* --- STEPPER (Barra de progreso) --- */
+.reserva-steps {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+/* Línea conectora */
+.reserva-steps::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: #e0e0e0;
+    z-index: 0;
+}
+
+.step {
+    background: white;
+    z-index: 1;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: default;
+}
+
+.step-number {
+    width: 35px;
+    height: 35px;
+    background: #e0e0e0;
+    color: #757575;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background: var(--color-secondary);
+    /* Dorado */
+    color: var(--color-primary);
+    /* Negro */
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+    /* Halo dorado */
+    transform: scale(1.1);
+}
+
+.step-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.step.active .step-label {
+    color: var(--color-primary);
+}
+
+/* --- GRID DE HORARIOS --- */
+.horarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+}
+
+/* Diseño de tarjeta para cada hora */
+.hora-slot {
+    position: relative;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0;
+    /* Quitamos padding para que el label llene todo */
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.hora-slot label {
+    display: block;
+    padding: 12px 0;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-dark);
+}
+
+.hora-slot:hover:not(.ocupado) {
+    border-color: var(--color-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Estado Seleccionado */
+.hora-slot input[type="radio"]:checked+label {
+    background-color: var(--color-primary);
+    /* Negro */
+    color: var(--color-secondary);
+    /* Dorado */
+    border: none;
+}
+
+/* Estado Ocupado */
+.hora-slot.ocupado {
+    background: #f5f5f5;
+    border-color: #eee;
+    opacity: 0.6;
+}
+
+.hora-slot.ocupado label {
+    cursor: not-allowed;
+    color: #aaa;
+    text-decoration: line-through;
+}
+
+/* --- INPUTS MODERNOS --- */
+.modern-input,
+.modern-select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.3s;
+    background: #fdfdfd;
+}
+
+.modern-input:focus,
+.modern-select:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.input-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input-icon-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+.input-with-icon {
+    padding-left: 45px;
+}
+
+/* RESUMEN FLOTANTE  */
+.reserva-summary {
+    width: 320px;
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 12px;
+    height: fit-content;
+    border: 1px solid #eee;
+    position: sticky;
+    top: 2rem;
+}
+
+.reserva-summary h4 {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--color-secondary);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.summary-row.total {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px dashed #ccc;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--color-primary);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .reserva-container {
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+
+    .reserva-summary {
+        width: 100%;
+        position: static;
+        margin-top: 2rem;
+    }
+
+    .reserva-steps::before {
+        display: none;
+    }
+}

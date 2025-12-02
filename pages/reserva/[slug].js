@@ -28,7 +28,7 @@ export default function Reserva() {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'https://barberia-proyecto-back-production-f876.up.railway.app';
 
-  // 1. Cargar datos del barbero
+  // Cargar datos del barbero
   useEffect(() => {
     if (!slug) return;
 
@@ -67,7 +67,6 @@ export default function Reserva() {
         setPeluquero({
           ...barberoEncontrado,
           horarios: formateado,
-          // Definimos servicios por defecto o los que vengan de la BD si existieran
           servicios: ['Corte básico', 'Corte premium', 'Tintura', 'Lavado', 'Peinado'],
           precios: {
             'Corte básico': 15000,
@@ -86,7 +85,7 @@ export default function Reserva() {
     cargarBarbero();
   }, [slug, backendUrl]);
 
-  // 2. Actualizar horas disponibles cuando cambia la fecha
+  // Actualizar horas disponibles cuando cambia la fecha
   useEffect(() => {
     if (selectedDate && peluquero && peluquero.horarios[selectedDate]) {
       setAvailableHours(peluquero.horarios[selectedDate]);
@@ -123,7 +122,7 @@ export default function Reserva() {
       if (!formData.servicio) return setError('Por favor, seleccione un servicio.');
     }
     setCurrentStep((prev) => prev + 1);
-    window.scrollTo(0, 0); // Subir al inicio al cambiar de paso
+    window.scrollTo(0, 0);
   };
 
   const handlePrevStep = () => {
@@ -187,7 +186,7 @@ export default function Reserva() {
 
   if (!peluquero && !error) {
     return (
-      <div className="reserva-container loading-container" style={{ textAlign: 'center', marginTop: '50px' }}>
+      <div className="reserva-container loading-container" style={{ textAlign: 'center', marginTop: '50px', display: 'block' }}>
         <h3>Cargando información del profesional...</h3>
       </div>
     );
@@ -199,191 +198,219 @@ export default function Reserva() {
         <title>Reserva | Valiant Barbería</title>
       </Head>
 
-      <section className="reserva-container">
+      <div style={{ background: '#f8f8f8', minHeight: '100vh', padding: '2rem 1rem' }}>
 
-        {/* Título Principal */}
+        {/* Encabezado */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2>AGENDAR CITA</h2>
-          {peluquero && <p style={{ color: '#666' }}>Reserva tu espacio con <strong>{peluquero.nombre}</strong></p>}
+          <h2 style={{ fontFamily: 'Bebas Neue', fontSize: '3rem', margin: 0 }}>AGENDAR CITA</h2>
+          {peluquero && <p style={{ color: '#666' }}>Reserva tu experiencia con <strong style={{ color: 'var(--color-secondary)' }}>{peluquero.nombre}</strong></p>}
         </div>
 
-        {/* Indicador de Pasos (Estilo Globals.css) */}
-        <div className="reserva-steps">
-          <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>
-            <div className="step-number">1</div>
-            <div className="step-label">Cita</div>
-          </div>
-          <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>
-            <div className="step-number">2</div>
-            <div className="step-label">Tus Datos</div>
-          </div>
-        </div>
+        {/* Contenedor Principal Flex */}
+        <section className="reserva-container">
 
-        <div className="reserva-content-wrapper">
+          <div className="reserva-content-wrapper">
 
-          {error && (
-            <div className="error-message">
-              <i className="fas fa-exclamation-circle"></i>
-              <span>{error}</span>
+            {/* Stepper Mejorado */}
+            <div className="reserva-steps">
+              <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>
+                <div className="step-number">{currentStep > 1 ? <i className="fas fa-check"></i> : '1'}</div>
+                <div className="step-label">Selección</div>
+              </div>
+              <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>
+                <div className="step-number">2</div>
+                <div className="step-label">Tus Datos</div>
+              </div>
             </div>
-          )}
 
-          {peluquero && (
-            <form onSubmit={handleSubmit} className="reserva-form">
+            {error && (
+              <div className="error-message">
+                <i className="fas fa-exclamation-circle"></i>
+                <span>{error}</span>
+              </div>
+            )}
 
-              {/* PASO 1: SELECCIÓN DE FECHA, HORA Y SERVICIO */}
-              {currentStep === 1 && (
-                <div className="form-step active">
+            {peluquero && (
+              <form onSubmit={handleSubmit} className="reserva-form">
 
-                  {/* Fecha */}
-                  <div className="form-group">
-                    <label> <i className="far fa-calendar-alt"></i> Selecciona una Fecha:</label>
-                    <input
-                      type="date"
-                      className="datepicker"
-                      value={formData.fecha}
-                      onChange={handleDateChange}
-                      min={new Date().toISOString().split('T')[0]}
-                    />
+                {/* PASO 1 */}
+                {currentStep === 1 && (
+                  <div className="form-step active">
+
+                    {/* Fecha */}
+                    <div className="form-group">
+                      <label className="input-label"><i className="far fa-calendar-alt"></i> ¿Qué día prefieres?</label>
+                      <input
+                        type="date"
+                        className="modern-input"
+                        value={formData.fecha}
+                        onChange={handleDateChange}
+                        min={new Date().toISOString().split('T')[0]}
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </div>
+
+                    {/* Horarios Grid */}
+                    <div className="form-group">
+                      <label className="input-label"><i className="far fa-clock"></i> Horarios Disponibles</label>
+
+                      {!selectedDate ? (
+                        <div style={{ padding: '20px', background: '#f0f0f0', borderRadius: '8px', textAlign: 'center', color: '#888' }}>
+                          <i className="fas fa-arrow-up"></i> Primero selecciona una fecha arriba.
+                        </div>
+                      ) : (
+                        <div className="horarios-grid">
+                          {Object.keys(availableHours).length > 0 ? (
+                            Object.keys(availableHours).map((hora) => (
+                              <div key={hora} className={`hora-slot ${availableHours[hora]}`}>
+                                <input
+                                  type="radio"
+                                  name="hora"
+                                  id={`hora-${hora}`}
+                                  value={hora}
+                                  checked={formData.hora === hora}
+                                  onChange={handleHourChange}
+                                  disabled={availableHours[hora] !== 'disponible'}
+                                />
+                                <label htmlFor={`hora-${hora}`}>{hora}</label>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="no-hours">No hay horas disponibles para esta fecha.</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Servicio */}
+                    <div className="form-group">
+                      <label className="input-label"><i className="fas fa-cut"></i> Selecciona el Servicio</label>
+                      <select
+                        value={formData.servicio}
+                        name="servicio"
+                        onChange={handleChange}
+                        required
+                        className="modern-select"
+                      >
+                        <option value="">-- Seleccionar --</option>
+                        {peluquero.servicios.map((s) => (
+                          <option key={s} value={s}>
+                            {s} — {peluquero.precios[s] ? `$${peluquero.precios[s].toLocaleString('es-CL')}` : 'Consultar'}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="form-navigation" style={{ marginTop: '30px', textAlign: 'right' }}>
+                      <button type="button" onClick={handleNextStep} className="btn-next">
+                        Siguiente Paso <i className="fas fa-arrow-right" style={{ marginLeft: '8px' }}></i>
+                      </button>
+                    </div>
                   </div>
+                )}
 
-                  {/* Horarios */}
-                  <div className="form-group">
-                    <label><i className="far fa-clock"></i> Horarios Disponibles:</label>
+                {/* PASO 2 */}
+                {currentStep === 2 && (
+                  <div className="form-step active">
+                    <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px', color: '#333' }}>Información de Contacto</h3>
+                    <p style={{ marginBottom: '20px', color: '#777', fontSize: '0.9rem' }}>Necesitamos estos datos para enviarte la confirmación.</p>
 
-                    {!selectedDate ? (
-                      <p style={{ fontStyle: 'italic', color: '#888' }}>Primero selecciona una fecha.</p>
-                    ) : (
-                      <div className="horarios-grid">
-                        {Object.keys(availableHours).length > 0 ? (
-                          Object.keys(availableHours).map((hora) => (
-                            <div
-                              key={hora}
-                              className={`hora-slot ${availableHours[hora]}`}
-                            >
-                              <input
-                                type="radio"
-                                name="hora"
-                                id={`hora-${hora}`}
-                                value={hora}
-                                checked={formData.hora === hora}
-                                onChange={handleHourChange}
-                                disabled={availableHours[hora] !== 'disponible'}
-                              />
-                              <label htmlFor={`hora-${hora}`}>{hora}</label>
-                            </div>
-                          ))
-                        ) : (
-                          <p className="no-hours">No hay horas disponibles para esta fecha.</p>
-                        )}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                      <div className="form-group">
+                        <label className="input-label">Nombre *</label>
+                        <div className="input-icon-wrapper">
+                          <i className="fas fa-user input-icon"></i>
+                          <input name="nombre" className="modern-input input-with-icon" value={formData.nombre} onChange={handleChange} required placeholder="Ej: Juan" />
+                        </div>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Servicio */}
-                  <div className="form-group">
-                    <label><i className="fas fa-cut"></i> Servicio:</label>
-                    <select
-                      value={formData.servicio}
-                      name="servicio"
-                      onChange={handleChange}
-                      required
-                      style={{ width: '100%', padding: '12px', borderRadius: '4px', border: '1px solid #ddd' }}
-                    >
-                      <option value="">-- Seleccionar servicio --</option>
-                      {peluquero.servicios.map((s) => (
-                        <option key={s} value={s}>
-                          {s} - ${peluquero.precios[s]?.toLocaleString('es-CL') || 'Consultar'}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-navigation">
-                    <div></div>
-                    <button type="button" onClick={handleNextStep} className="btn-next">
-                      Siguiente <i className="fas fa-arrow-right"></i>
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* DATOS DEL CLIENTE */}
-              {currentStep === 2 && (
-                <div className="form-step active">
-                  <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px' }}>Datos de Contacto</h3>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                    <div className="form-group">
-                      <label>Nombre *</label>
-                      <input name="nombre" value={formData.nombre} onChange={handleChange} required placeholder="Ej: Juan" />
+                      <div className="form-group">
+                        <label className="input-label">Apellido *</label>
+                        <div className="input-icon-wrapper">
+                          <i className="fas fa-user input-icon"></i>
+                          <input name="apellido" className="modern-input input-with-icon" value={formData.apellido} onChange={handleChange} required placeholder="Ej: Pérez" />
+                        </div>
+                      </div>
                     </div>
+
                     <div className="form-group">
-                      <label>Apellido *</label>
-                      <input name="apellido" value={formData.apellido} onChange={handleChange} required placeholder="Ej: Pérez" />
+                      <label className="input-label">Correo Electrónico *</label>
+                      <div className="input-icon-wrapper">
+                        <i className="fas fa-envelope input-icon"></i>
+                        <input name="email" type="email" className="modern-input input-with-icon" value={formData.email} onChange={handleChange} required placeholder="nombre@correo.com" />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                      <div className="form-group">
+                        <label className="input-label">Teléfono *</label>
+                        <div className="input-icon-wrapper">
+                          <i className="fas fa-phone input-icon"></i>
+                          <input name="telefono" className="modern-input input-with-icon" value={formData.telefono} onChange={handleChange} required placeholder="+56 9..." />
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label className="input-label">RUT (Opcional)</label>
+                        <div className="input-icon-wrapper">
+                          <i className="fas fa-id-card input-icon"></i>
+                          <input name="rut" className="modern-input input-with-icon" value={formData.rut} onChange={handleChange} placeholder="12.345.678-9" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="form-navigation" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '30px' }}>
+                      <button type="button" onClick={handlePrevStep} className="btn-prev">
+                        <i className="fas fa-arrow-left" style={{ marginRight: '8px' }}></i> Volver
+                      </button>
+                      <button type="submit" className="btn-confirmar">
+                        Confirmar Cita <i className="fas fa-check-circle" style={{ marginLeft: '8px' }}></i>
+                      </button>
                     </div>
                   </div>
+                )}
+              </form>
+            )}
+          </div>
 
-                  <div className="form-group">
-                    <label>Email *</label>
-                    <input name="email" type="email" value={formData.email} onChange={handleChange} required placeholder="correo@ejemplo.com" />
-                  </div>
+          {/* RESUMEN LATERAL */}
+          <aside className="reserva-summary">
+            <h4><i className="fas fa-receipt"></i> Tu Resumen</h4>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                    <div className="form-group">
-                      <label>Teléfono *</label>
-                      <input name="telefono" value={formData.telefono} onChange={handleChange} required placeholder="+56 9..." />
-                    </div>
-                    <div className="form-group">
-                      <label>RUT (Opcional)</label>
-                      <input name="rut" value={formData.rut} onChange={handleChange} placeholder="12.345.678-9" />
-                    </div>
-                  </div>
+            <div className="summary-row">
+              <span>Barbero:</span>
+              <strong>{peluquero?.nombre || 'Seleccionando...'}</strong>
+            </div>
+            <div className="summary-row">
+              <span>Fecha:</span>
+              <strong>{formData.fecha ? new Date(formData.fecha).toLocaleDateString() : '--/--/--'}</strong>
+            </div>
+            <div className="summary-row">
+              <span>Hora:</span>
+              <strong>{formData.hora || '--:--'}</strong>
+            </div>
 
-                  <div className="form-navigation">
-                    <button type="button" onClick={handlePrevStep} className="btn-prev">
-                      <i className="fas fa-arrow-left"></i> Volver
-                    </button>
-                    <button type="submit" className="btn-confirmar">
-                      Confirmar Reserva <i className="fas fa-check"></i>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </form>
-          )}
-        </div>
+            <div style={{ margin: '15px 0', borderBottom: '1px solid #eee' }}></div>
 
-        {/* RESUMEN LATERAL */}
-        <aside className="reserva-summary">
-          <h4>Resumen de Reserva</h4>
-          <div className="summary-content">
-            <div className="summary-item">
-              <strong>Profesional:</strong>
-              <span>{peluquero?.nombre || '---'}</span>
+            <div className="summary-row">
+              <span>Servicio:</span>
+              <span style={{ textAlign: 'right', maxWidth: '150px' }}>{formData.servicio || '---'}</span>
             </div>
-            <div className="summary-item">
-              <strong>Fecha:</strong>
-              <span>{formData.fecha || '---'}</span>
-            </div>
-            <div className="summary-item">
-              <strong>Hora:</strong>
-              <span>{formData.hora || '---'}</span>
-            </div>
-            <div className="summary-item">
-              <strong>Servicio:</strong>
-              <span style={{ color: 'var(--color-secondary)', fontWeight: 'bold' }}>{formData.servicio || '---'}</span>
-            </div>
+
             {peluquero?.precios[formData.servicio] && (
-              <div className="summary-item">
-                <strong>Total:</strong>
+              <div className="summary-row total">
+                <span>TOTAL A PAGAR</span>
                 <span>${peluquero.precios[formData.servicio].toLocaleString('es-CL')}</span>
               </div>
             )}
-          </div>
-        </aside>
 
-      </section>
+            {!peluquero?.precios[formData.servicio] && (
+              <p style={{ fontSize: '0.8rem', color: '#999', marginTop: '20px', textAlign: 'center' }}>
+                * El precio final se confirmará en el local.
+              </p>
+            )}
+          </aside>
+
+        </section>
+      </div>
     </>
   );
 }
